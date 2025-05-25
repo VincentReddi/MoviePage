@@ -22,7 +22,7 @@ export default {
     };
   },
   mounted() {
-    fetch('http://localhost:8080/movies')
+    fetch('https://popcornpilot-backend-new.onrender.com/movies')
         .then(response => response.json())
         .then(data => {
           this.movies = data;
