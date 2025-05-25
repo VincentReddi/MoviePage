@@ -7,7 +7,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
 
-@CrossOrigin(origins = "https://popcornpilot-frontend.onrender.com")
+@CrossOrigin(origins = "*")
 @RestController
 public class MovieController {
 
