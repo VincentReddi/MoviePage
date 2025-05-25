@@ -1,13 +1,14 @@
 FROM eclipse-temurin:17-jdk-alpine
 
-# Arbeitsverzeichnis im Container
 WORKDIR /app
 
-# Projektdateien kopieren
 COPY . .
 
-# Projekt bauen
+# 🛠 Das hier erlaubt das Ausführen von ./gradlew
+RUN chmod +x gradlew
+
+# ✅ Projekt bauen
 RUN ./gradlew build
 
-# Die erstellte JAR-Datei starten
+# ✅ JAR starten
 CMD ["sh", "-c", "java -jar build/libs/*.jar"]
