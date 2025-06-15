@@ -17,8 +17,8 @@ public class MovieController {
     @GetMapping
     public List<Movie> getMovies() {
         List<Movie> movies = List.of(
-                new Movie("Interstellar", "Sci-Fi", "Netflix", null, "123", "interstellar.jpg", "Watched"),
-                new Movie("Barbie", "Comedy", "Prime", null, "456", "barbie.jpg", "Watched")
+                new Movie("Interstellar", "Sci-Fi", "Netflix", null, "123", "https://image.tmdb.org/t/p/original/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg", "Watched"),
+                new Movie("Barbie", "Comedy", "Prime", null, "456", "https://image.tmdb.org/t/p/original/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg", "Watched")
         );
 
         for (Movie movie : movies) {
