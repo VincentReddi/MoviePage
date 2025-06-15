@@ -8,7 +8,17 @@
       <p><strong>Genre:</strong> {{ movie.genre }}</p>
       <p><strong>Plattform:</strong> {{ movie.platform }}</p>
       <p><strong>Status:</strong> {{ movie.status }}</p>
-      <p><strong>Meine Bewertung:</strong> {{ movie.personalRating }}/10</p>
+      <p><strong>Meine Bewertung:</strong> {{ movie.personalRating || "Keine" }}/10</p>
+
+      <input
+          type="number"
+          v-model="ratingInputs[movie.tmdbId]"
+          placeholder="Neue Bewertung (z. B. 4.5)"
+          step="0.1"
+          min="0"
+          max="10"
+      />
+      <button @click="updateRating(movie.tmdbId)">Speichern</button>
     </div>
   </div>
 </template>
@@ -18,15 +28,30 @@ export default {
   name: 'PopcornPilot',
   data() {
     return {
-      movies: []
+      movies: [],
+      ratingInputs: {}
     };
   },
   mounted() {
-    fetch('https://popcornpilot-backend-new.onrender.com/movies')
+    fetch('https://popcornpilot-backend-new.onrender.com/api/movies')
         .then(response => response.json())
         .then(data => {
           this.movies = data;
         });
+  },
+  methods: {
+    updateRating(tmdbId) {
+      const value = this.ratingInputs[tmdbId];
+      if (!value) return;
+
+      fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${tmdbId}/rating`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(value)
+      })
+          .then(() => alert("Bewertung gespeichert!"))
+          .catch(() => alert("Fehler beim Speichern."));
+    }
   }
 };
 </script>
@@ -37,25 +62,27 @@ export default {
   padding: 16px;
   margin: 12px auto;
   border-radius: 8px;
-  background-color: #1e1e1e; /* dunkler Hintergrund */
-  color: #f0f0f0; /* heller Text */
+  background-color: #1e1e1e;
+  color: #f0f0f0;
   width: 90%;
   max-width: 500px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   text-align: left;
 }
+
 .movie-card img {
   width: 100px;
   float: left;
   margin-right: 16px;
 }
+
 .movie-card h3 {
   margin-top: 0;
 }
+
 .movie-card::after {
   content: "";
   display: block;
   clear: both;
 }
 </style>
-
