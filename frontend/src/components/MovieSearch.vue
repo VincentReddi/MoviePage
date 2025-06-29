@@ -8,7 +8,12 @@
         class="search-input"
     />
     <div v-if="results.length" class="results">
-      <div v-for="movie in results" :key="movie.id" class="movie-card">
+      <router-link
+          v-for="movie in results"
+          :key="movie.id"
+          :to="`/movie/${movie.id}`"
+          class="movie-card"
+      >
         <img
             v-if="movie.poster_path"
             :src="'https://image.tmdb.org/t/p/w300' + movie.poster_path"
@@ -20,9 +25,9 @@
           <p class="meta">
             {{ movie.release_date?.slice(0, 4) || 'N/A' }} · ⭐ {{ movie.vote_average ? movie.vote_average.toFixed(1) : '–' }}
           </p>
-          <p class="overview">{{ movie.overview }}</p>
+          <p class="overview">{{ movie.overview.slice(0, 150) }}...</p>
         </div>
-      </div>
+      </router-link>
     </div>
   </div>
 </template>
@@ -101,6 +106,8 @@ export default {
   display: flex;
   flex-direction: column;
   transition: transform 0.2s ease;
+  text-decoration: none;
+  color: inherit;
 }
 .movie-card:hover {
   transform: translateY(-5px);
