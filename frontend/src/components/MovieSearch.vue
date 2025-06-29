@@ -20,7 +20,7 @@
           <p class="meta">
             {{ movie.release_date?.slice(0, 4) || 'N/A' }} · ⭐ {{ movie.vote_average ? movie.vote_average.toFixed(1) : '–' }}
           </p>
-          <p class="overview">{{ movie.overview.slice(0, 150) }}...</p>
+          <p class="overview">{{ movie.overview }}</p>
         </div>
       </div>
     </div>
