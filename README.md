@@ -14,7 +14,7 @@ Eine moderne Web-App zur Verwaltung von Filmen, die man sehen will, bereits gese
 4. Status setzen (geplant, gesehen, abgebrochen)  
 5. Zufallsvorschlag  
 6. Filminformationen von TMDb anzeigen  
-7. Dark Mode 
+7. Film selber bewerten  
 
 ## Projekt lokal starten
 

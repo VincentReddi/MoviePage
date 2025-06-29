@@ -34,10 +34,4 @@ public class MovieController {
         Rating rating = new Rating(tmdbId, ratingValue);
         return ratingRepository.save(rating);
     }
-
-    @PostMapping
-    public String addTestMovie(@RequestBody Movie movie) {
-        System.out.println("Received movie: " + movie.getTitle());
-        return "Saved: " + movie.getTitle();
-    }
 }
