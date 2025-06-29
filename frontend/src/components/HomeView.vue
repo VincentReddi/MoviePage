@@ -25,6 +25,7 @@
           <label for="rating">Rate this movie:</label>
           <input type="range" id="rating" v-model="rating" min="0" max="10" step="1" />
           <p>Your rating: {{ rating }}/10</p>
+          <button @click="updateRating(selectedMovie.id)">Save Rating</button>
         </div>
       </div>
     </div>
@@ -68,6 +69,21 @@ export default {
       rating.value = 0
     }
 
+    const updateRating = async (tmdbId) => {
+      if (!rating.value) return
+
+      try {
+        await fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${tmdbId}/rating`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rating: rating.value })
+        })
+        alert('Rating saved successfully!')
+      } catch (error) {
+        alert('Error saving rating.')
+      }
+    }
+
     return {
       query,
       results,
@@ -78,6 +94,7 @@ export default {
       getPosterUrl,
       openDetail,
       closeDetail,
+      updateRating,
     }
   },
 }
