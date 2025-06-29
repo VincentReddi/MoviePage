@@ -1,10 +1,10 @@
 <template>
   <div class="home-view">
-    <div class="search-bar">
+    <div v-if="!selectedMovie" class="search-bar">
       <h1>🎥 Discover Movies</h1>
       <input v-model="query" @input="searchMovies" placeholder="Search for movies..." />
       <ul v-if="results.length" class="results">
-        <li v-for="movie in results" :key="movie.id" class="movie-card">
+        <li v-for="movie in results" :key="movie.id" class="movie-card" @click="openDetail(movie.id)">
           <img :src="getPosterUrl(movie.poster_path)" alt="Poster" />
           <div class="movie-info">
             <h3>{{ movie.title }}</h3>
@@ -12,6 +12,16 @@
           </div>
         </li>
       </ul>
+      <div v-else-if="searched" class="no-results">No results found.</div>
+    </div>
+    <div v-else class="movie-detail">
+      <button @click="closeDetail" class="back-button">Back</button>
+      <div class="movie-info">
+        <img :src="getPosterUrl(selectedMovie.poster_path)" alt="Poster" />
+        <h1>{{ selectedMovie.title }}</h1>
+        <p><strong>Release Date:</strong> {{ selectedMovie.release_date }}</p>
+        <p><strong>Overview:</strong> {{ selectedMovie.overview || 'No description available.' }}</p>
+      </div>
     </div>
   </div>
 </template>
@@ -22,32 +32,44 @@ import { ref } from 'vue'
 export default {
   name: 'HomeView',
   setup() {
+    const apiKey = '3e1a60c002b082d8f881975fa6a5fe50'
     const query = ref('')
     const results = ref([])
+    const searched = ref(false)
+    const selectedMovie = ref(null)
 
     const searchMovies = async () => {
-      if (query.value.trim()) {
-        try {
-          const apiKey = '3e1a60c002b082d8f881975fa6a5fe50'
-          const response = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${query.value}`)
-          const data = await response.json()
-          results.value = data.results || []
-        } catch (error) {
-          console.error('Error fetching movies:', error)
-        }
-      } else {
-        results.value = []
-      }
+      if (!query.value.trim()) return
+      const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(query.value)}`
+      const res = await fetch(url)
+      const data = await res.json()
+      results.value = data.results || []
+      searched.value = true
     }
 
     const getPosterUrl = (path) =>
         path ? `https://image.tmdb.org/t/p/w200${path}` : 'https://via.placeholder.com/200x300?text=No+Image'
 
+    const openDetail = async (id) => {
+      const url = `https://api.themoviedb.org/3/movie/${id}?api_key=${apiKey}`
+      const res = await fetch(url)
+      const data = await res.json()
+      selectedMovie.value = data
+    }
+
+    const closeDetail = () => {
+      selectedMovie.value = null
+    }
+
     return {
       query,
       results,
+      searched,
+      selectedMovie,
       searchMovies,
       getPosterUrl,
+      openDetail,
+      closeDetail,
     }
   },
 }
@@ -101,6 +123,7 @@ export default {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
 .movie-card:hover {
@@ -127,5 +150,48 @@ export default {
 .movie-info p {
   font-size: 0.9rem;
   color: #666;
+}
+
+.no-results {
+  color: #999;
+  font-size: 1.2rem;
+  margin-top: 20px;
+}
+
+.movie-detail {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.movie-detail img {
+  width: 300px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.movie-detail h1 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.movie-detail p {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.back-button {
+  padding: 10px 20px;
+  margin-bottom: 20px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  background: #0056b3;
 }
 </style>
