@@ -62,7 +62,6 @@ const addToWatchlist = (movie) => {
 
 const searchMovies = async () => {
   if (!query.value.trim()) return
-
   const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&language=de&query=${encodeURIComponent(query.value)}`
   const res = await fetch(url)
   const data = await res.json()
@@ -79,7 +78,6 @@ const loadGenres = async () => {
 
 const filterByGenre = async () => {
   if (!selectedGenre.value) return
-
   const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&language=de&with_genres=${selectedGenre.value}`
   const res = await fetch(url)
   const data = await res.json()
