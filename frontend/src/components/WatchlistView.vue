@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { useWatchlistStore } from '../stores/watchlist'
+import { useWatchlistStore } from '../stores/watchlist.js'
 import { storeToRefs } from 'pinia'
 
 export default {

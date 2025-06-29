@@ -14,7 +14,7 @@
 <script>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { useWatchlistStore } from '../stores/watchlist'
+import { useWatchlistStore } from '../stores/watchlist.js'
 
 export default {
   setup() {

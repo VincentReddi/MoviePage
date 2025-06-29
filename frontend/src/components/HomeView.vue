@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import SearchMovies from '../components/SearchMovies.vue'
+import SearchMovies from './SearchMovies.vue'
 
 export default {
   components: {
