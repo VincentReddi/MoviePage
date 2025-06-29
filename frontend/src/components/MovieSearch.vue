@@ -18,7 +18,7 @@
         <div class="info">
           <h2>{{ movie.title }}</h2>
           <p class="meta">
-            {{ movie.release_date?.slice(0, 4) || 'N/A' }} · ⭐ {{ movie.vote_average || '–' }}
+            {{ movie.release_date?.slice(0, 4) || 'N/A' }} · ⭐ {{ movie.vote_average ? movie.vote_average.toFixed(1) : '–' }}
           </p>
           <p class="overview">{{ movie.overview.slice(0, 150) }}...</p>
         </div>
@@ -64,20 +64,28 @@ export default {
   padding: 2rem;
   max-width: 960px;
   margin: 0 auto;
+  background-color: #121212;
+  color: #f0f0f0;
+  min-height: 100vh;
 }
 .search-input {
   width: 100%;
   padding: 0.75rem 1rem;
   font-size: 1rem;
-  border: 1px solid #ccc;
+  border: none;
   border-radius: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  background-color: #1e1e1e;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
   transition: all 0.3s ease;
+}
+.search-input::placeholder {
+  color: #aaa;
 }
 .search-input:focus {
   outline: none;
-  border-color: #007aff;
-  box-shadow: 0 0 0 3px rgba(0,122,255,0.2);
+  border: 1px solid #007aff;
+  box-shadow: 0 0 0 3px rgba(0,122,255,0.3);
 }
 .results {
   display: grid;
@@ -86,10 +94,10 @@ export default {
   margin-top: 2rem;
 }
 .movie-card {
-  background: white;
+  background: #1a1a1a;
   border-radius: 1.25rem;
   overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
   display: flex;
   flex-direction: column;
   transition: transform 0.2s ease;
@@ -109,15 +117,15 @@ export default {
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: #111;
+  color: #fff;
 }
 .meta {
   font-size: 0.9rem;
-  color: #666;
+  color: #999;
   margin-bottom: 0.5rem;
 }
 .overview {
   font-size: 0.9rem;
-  color: #444;
+  color: #ccc;
 }
 </style>
