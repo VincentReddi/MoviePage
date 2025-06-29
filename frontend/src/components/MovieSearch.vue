@@ -3,16 +3,26 @@
     <input
         type="text"
         v-model="query"
-        placeholder="Nach Filmen suchen..."
+        placeholder="🔍 Nach Filmen suchen..."
         @input="searchMovies"
+        class="search-input"
     />
-    <div v-if="results.length">
-      <h3>Suchergebnisse:</h3>
-      <ul>
-        <li v-for="movie in results" :key="movie.id">
-          {{ movie.title }} ({{ movie.release_date?.slice(0, 4) || 'N/A' }})
-        </li>
-      </ul>
+    <div v-if="results.length" class="results">
+      <div v-for="movie in results" :key="movie.id" class="movie-card">
+        <img
+            v-if="movie.poster_path"
+            :src="'https://image.tmdb.org/t/p/w300' + movie.poster_path"
+            :alt="movie.title"
+            class="poster"
+        />
+        <div class="info">
+          <h2>{{ movie.title }}</h2>
+          <p class="meta">
+            {{ movie.release_date?.slice(0, 4) || 'N/A' }} · ⭐ {{ movie.vote_average || '–' }}
+          </p>
+          <p class="overview">{{ movie.overview.slice(0, 150) }}...</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -51,12 +61,63 @@ export default {
 
 <style scoped>
 .movie-search {
+  padding: 2rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+.search-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+.search-input:focus {
+  outline: none;
+  border-color: #007aff;
+  box-shadow: 0 0 0 3px rgba(0,122,255,0.2);
+}
+.results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+.movie-card {
+  background: white;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease;
+}
+.movie-card:hover {
+  transform: translateY(-5px);
+}
+.poster {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+.info {
   padding: 1rem;
 }
-input[type="text"] {
-  width: 100%;
-  padding: 0.5rem;
-  font-size: 1rem;
-  margin-bottom: 1rem;
+.info h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #111;
+}
+.meta {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+.overview {
+  font-size: 0.9rem;
+  color: #444;
 }
 </style>
