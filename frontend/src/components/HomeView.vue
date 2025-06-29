@@ -2,45 +2,35 @@
   <div class="home-view">
     <div class="search-bar">
       <h1>🎥 Discover Movies</h1>
+      <input v-model="query" @input="searchMovies" placeholder="Search for movies..." />
+      <input v-model="genreQuery" placeholder="Search by genre..." />
       <button @click="writeTestToDatabase">Create Test Movie</button>
     </div>
-    <div v-if="!selectedMovie" class="search-bar">
-      <input v-model="query" @input="searchMovies" placeholder="Search for movies..." />
-      <ul v-if="results.length" class="results">
-        <li v-for="movie in results" :key="movie.id" class="movie-card" @click="openDetail(movie.id)">
-          <img :src="getPosterUrl(movie.poster_path)" alt="Poster" />
-          <div class="movie-info">
-            <h3>{{ movie.title }}</h3>
-            <p>{{ movie.release_date?.slice(0, 4) || '–' }}</p>
-          </div>
-        </li>
-      </ul>
-      <div v-else-if="searched" class="no-results">No results found.</div>
-    </div>
-    <div v-else class="movie-detail">
-      <button @click="closeDetail" class="back-button">Back</button>
-      <div class="movie-info">
-        <img :src="getPosterUrl(selectedMovie.poster_path)" alt="Poster" />
-        <h1>{{ selectedMovie.title }}</h1>
-        <p><strong>Release Date:</strong> {{ selectedMovie.release_date }}</p>
-        <p><strong>Overview:</strong> {{ selectedMovie.overview || 'No description available.' }}</p>
-        <button @click="addToList(selectedMovie.title)">Add to My List</button>
-      </div>
-    </div>
+    <ul v-if="filteredResults.length" class="results">
+      <li v-for="movie in filteredResults" :key="movie.id" class="movie-card" @click="openDetail(movie.id)">
+        <img :src="getPosterUrl(movie.poster_path)" alt="Poster" />
+        <div class="movie-info">
+          <h3>{{ movie.title }}</h3>
+          <p>{{ movie.release_date?.slice(0, 4) || '–' }}</p>
+          <p><strong>Genre:</strong> {{ movie.genre }}</p>
+        </div>
+      </li>
+    </ul>
+    <div v-else-if="searched" class="no-results">No results found.</div>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 export default {
   name: 'HomeView',
   setup() {
     const apiKey = '3e1a60c002b082d8f881975fa6a5fe50'
     const query = ref('')
+    const genreQuery = ref('')
     const results = ref([])
     const searched = ref(false)
-    const selectedMovie = ref(null)
 
     const searchMovies = async () => {
       if (!query.value.trim()) return
@@ -51,6 +41,11 @@ export default {
       searched.value = true
     }
 
+    const filteredResults = computed(() => {
+      if (!genreQuery.value.trim()) return results.value
+      return results.value.filter(movie => movie.genre?.toLowerCase().includes(genreQuery.value.toLowerCase()))
+    })
+
     const getPosterUrl = (path) =>
         path ? `https://image.tmdb.org/t/p/w200${path}` : 'https://via.placeholder.com/200x300?text=No+Image'
 
@@ -59,32 +54,6 @@ export default {
       const res = await fetch(url)
       const data = await res.json()
       selectedMovie.value = data
-    }
-
-    const closeDetail = () => {
-      selectedMovie.value = null
-    }
-
-    const addToList = async (movieTitle) => {
-      try {
-        const response = await fetch('https://popcornpilot-backend-new.onrender.com/api/movies', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title: movieTitle })
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error('Error adding movie to list:', errorData);
-          alert(`Failed to add movie to your list. Error: ${errorData.message || 'Unknown error'}`);
-          return;
-        }
-
-        alert('Movie added to your list successfully!');
-      } catch (error) {
-        console.error('Network error:', error);
-        alert(`Error adding movie to your list. Network error: ${error.message}`);
-      }
     }
 
     const writeTestToDatabase = async () => {
@@ -121,14 +90,13 @@ export default {
 
     return {
       query,
+      genreQuery,
       results,
       searched,
-      selectedMovie,
       searchMovies,
+      filteredResults,
       getPosterUrl,
       openDetail,
-      closeDetail,
-      addToList,
       writeTestToDatabase,
     }
   },
@@ -216,55 +184,5 @@ export default {
   color: #999;
   font-size: 1.2rem;
   margin-top: 20px;
-}
-
-.movie-detail {
-  text-align: center;
-  margin-top: 20px;
-}
-
-.movie-detail img {
-  width: 300px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-}
-
-.movie-detail h1 {
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 10px;
-}
-
-.movie-detail p {
-  font-size: 1rem;
-  color: #666;
-  margin-bottom: 10px;
-}
-
-.back-button {
-  padding: 10px 20px;
-  margin-bottom: 20px;
-  background: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.back-button:hover {
-  background: #0056b3;
-}
-
-button {
-  padding: 10px 20px;
-  background: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #0056b3;
 }
 </style>
