@@ -2,7 +2,7 @@
   <div class="home-view">
     <div class="search-bar">
       <h1>🎥 Discover Movies</h1>
-      <button @click="writeTestToDatabase">Write TEST to Database</button>
+      <button @click="writeTestToDatabase">Create Test Movie</button>
     </div>
     <div v-if="!selectedMovie" class="search-bar">
       <input v-model="query" @input="searchMovies" placeholder="Search for movies..." />
@@ -69,8 +69,8 @@ export default {
       try {
         const response = await fetch('https://popcornpilot-backend-new.onrender.com/api/movies', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({title: movieTitle})
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: movieTitle })
         });
 
         if (!response.ok) {
@@ -88,24 +88,34 @@ export default {
     }
 
     const writeTestToDatabase = async () => {
+      const testMovie = {
+        title: "Interstellar",
+        genre: "Sci-Fi",
+        platform: "Netflix",
+        personalRating: null,
+        tmdbId: "123",
+        posterUrl: "https://image.tmdb.org/t/p/original/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+        status: "Watched"
+      };
+
       try {
         const response = await fetch('https://popcornpilot-backend-new.onrender.com/api/movies', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({title: 'TEST'})
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(testMovie)
         });
 
         if (!response.ok) {
           const errorData = await response.json();
-          console.error('Error writing TEST to database:', errorData);
-          alert(`Failed to write TEST to database. Error: ${errorData.message || 'Unknown error'}`);
+          console.error('Error writing test movie to database:', errorData);
+          alert(`Failed to write test movie to database. Error: ${errorData.message || 'Unknown error'}`);
           return;
         }
 
-        alert('TEST written to database successfully!');
+        alert('Test movie written to database successfully!');
       } catch (error) {
         console.error('Network error:', error);
-        alert(`Error writing TEST to database. Network error: ${error.message}`);
+        alert(`Error writing test movie to database. Network error: ${error.message}`);
       }
     }
 
