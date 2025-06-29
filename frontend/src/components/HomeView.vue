@@ -70,17 +70,29 @@ export default {
     }
 
     const updateRating = async (tmdbId) => {
-      if (!rating.value) return
+      if (!rating.value) {
+        alert('Please select a rating before saving.')
+        return
+      }
 
       try {
-        await fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${tmdbId}/rating`, {
+        const response = await fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${tmdbId}/rating`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ rating: rating.value })
         })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          console.error('Error saving rating:', errorData)
+          alert('Failed to save rating. Please try again.')
+          return
+        }
+
         alert('Rating saved successfully!')
       } catch (error) {
-        alert('Error saving rating.')
+        console.error('Network error:', error)
+        alert('Error saving rating. Please check your connection.')
       }
     }
 
