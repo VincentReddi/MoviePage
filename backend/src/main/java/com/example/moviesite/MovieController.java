@@ -1,6 +1,8 @@
 package com.example.moviesite;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -9,17 +11,16 @@ import java.util.List;
 public class MovieController {
 
     private final RatingRepository ratingRepository;
+    private final MovieRepository movieRepository;
 
-    public MovieController(RatingRepository ratingRepository) {
+    public MovieController(RatingRepository ratingRepository, MovieRepository movieRepository) {
         this.ratingRepository = ratingRepository;
+        this.movieRepository = movieRepository;
     }
 
     @GetMapping
     public List<Movie> getMovies() {
-        List<Movie> movies = List.of(
-                new Movie("Interstellar", "Sci-Fi", "Netflix", null, "123", "https://image.tmdb.org/t/p/original/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg", "Watched"),
-                new Movie("Barbie", "Comedy", "Prime", null, "456", "https://image.tmdb.org/t/p/original/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg", "Watched")
-        );
+        List<Movie> movies = movieRepository.findAll();
 
         for (Movie movie : movies) {
             ratingRepository.findById(movie.getTmdbId())
@@ -27,6 +28,12 @@ public class MovieController {
         }
 
         return movies;
+    }
+
+    @PostMapping
+    public ResponseEntity<Movie> addMovie(@RequestBody Movie movie) {
+        Movie saved = movieRepository.save(movie);
+        return ResponseEntity.ok(saved);
     }
 
     @PutMapping("/{tmdbId}/rating")
