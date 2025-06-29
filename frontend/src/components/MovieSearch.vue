@@ -43,6 +43,7 @@
           <p><strong>Veröffentlichung:</strong> {{ selectedMovie.release_date }}</p>
           <p><strong>Bewertung:</strong> ⭐ {{ selectedMovie.vote_average ? selectedMovie.vote_average.toFixed(1) : '–' }}</p>
           <p class="modal-overview">{{ selectedMovie.overview }}</p>
+          <button @click="addToList(selectedMovie)" class="add-btn">Zur Liste hinzufügen</button>
           <button @click="selectedMovie = null" class="close-btn">Schließen</button>
         </div>
       </div>
@@ -81,6 +82,32 @@ export default {
     },
     selectMovie(movie) {
       this.selectedMovie = movie
+    },
+    async addToList(movie) {
+      const payload = {
+        title: movie.title,
+        posterPath: movie.poster_path,
+        releaseDate: movie.release_date,
+        description: movie.overview,
+        status: 'geplant'
+      }
+
+      try {
+        const res = await fetch('https://popcornpilot-backend-new.onrender.com/api/movies', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+
+        if (res.ok) {
+          alert('Film wurde gespeichert!')
+        } else {
+          alert('Fehler beim Speichern. Prüfe die Felder.')
+        }
+      } catch (e) {
+        console.error('Fehler beim Speichern:', e)
+        alert('Verbindungsfehler oder ungültige Daten.')
+      }
     }
   }
 }
@@ -211,5 +238,19 @@ export default {
 }
 .close-btn:hover {
   background: #005bb5;
+}
+.add-btn {
+  margin-top: 1.5rem;
+  margin-right: 1rem;
+  padding: 0.5rem 1rem;
+  background: #00c853;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.add-btn:hover {
+  background: #009624;
 }
 </style>
