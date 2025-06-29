@@ -4,7 +4,7 @@ import MovieList from './components/MovieList.vue'
 
 <template>
   <div id="app">
-    <h1>🎬 MoviePage</h1>
+    <h1>🎬 PopcornPilot</h1>
     <MovieSearch />
     <MovieList />
   </div>

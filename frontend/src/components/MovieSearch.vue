@@ -62,11 +62,13 @@ export default {
 <style scoped>
 .movie-search {
   padding: 2rem;
-  max-width: 960px;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
   background-color: #121212;
   color: #f0f0f0;
   min-height: 100vh;
+  box-sizing: border-box;
 }
 .search-input {
   width: 100%;
