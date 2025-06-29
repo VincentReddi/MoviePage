@@ -21,6 +21,11 @@
         <h1>{{ selectedMovie.title }}</h1>
         <p><strong>Release Date:</strong> {{ selectedMovie.release_date }}</p>
         <p><strong>Overview:</strong> {{ selectedMovie.overview || 'No description available.' }}</p>
+        <div class="rating-section">
+          <label for="rating">Rate this movie:</label>
+          <input type="range" id="rating" v-model="rating" min="0" max="10" step="1" />
+          <p>Your rating: {{ rating }}/10</p>
+        </div>
       </div>
     </div>
   </div>
@@ -37,6 +42,7 @@ export default {
     const results = ref([])
     const searched = ref(false)
     const selectedMovie = ref(null)
+    const rating = ref(0)
 
     const searchMovies = async () => {
       if (!query.value.trim()) return
@@ -59,6 +65,7 @@ export default {
 
     const closeDetail = () => {
       selectedMovie.value = null
+      rating.value = 0
     }
 
     return {
@@ -66,6 +73,7 @@ export default {
       results,
       searched,
       selectedMovie,
+      rating,
       searchMovies,
       getPosterUrl,
       openDetail,
@@ -179,6 +187,25 @@ export default {
   font-size: 1rem;
   color: #666;
   margin-bottom: 10px;
+}
+
+.rating-section {
+  margin-top: 20px;
+}
+
+.rating-section label {
+  font-size: 1rem;
+  color: #333;
+}
+
+.rating-section input {
+  margin: 10px 0;
+  width: 100%;
+}
+
+.rating-section p {
+  font-size: 1rem;
+  color: #666;
 }
 
 .back-button {
