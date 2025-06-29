@@ -8,11 +8,11 @@
         class="search-input"
     />
     <div v-if="results.length" class="results">
-      <router-link
+      <div
           v-for="movie in results"
           :key="movie.id"
-          :to="`/movie/${movie.id}`"
           class="movie-card"
+          @click="selectMovie(movie)"
       >
         <img
             v-if="movie.poster_path"
@@ -27,7 +27,7 @@
           </p>
           <p class="overview">{{ movie.overview.slice(0, 150) }}...</p>
         </div>
-      </router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -59,6 +59,10 @@ export default {
         console.error('Fehler bei der TMDb-Suche:', error)
         this.results = []
       }
+    },
+    selectMovie(movie) {
+      console.log('Ausgewählter Film:', movie)
+      // Hier kannst du z. B. ein Modal öffnen oder die Details unten anzeigen
     }
   }
 }
@@ -73,6 +77,7 @@ export default {
   color: #f0f0f0;
   box-sizing: border-box;
 }
+
 .search-input {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -81,56 +86,67 @@ export default {
   border-radius: 1rem;
   background-color: #1e1e1e;
   color: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
   transition: all 0.3s ease;
 }
+
 .search-input::placeholder {
   color: #aaa;
 }
+
 .search-input:focus {
   outline: none;
   border: 1px solid #007aff;
-  box-shadow: 0 0 0 3px rgba(0,122,255,0.3);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
 }
+
 .results {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
 }
+
 .movie-card {
   background: #1a1a1a;
   border-radius: 1.25rem;
   overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
   transition: transform 0.2s ease;
   text-decoration: none;
   color: inherit;
+  cursor: pointer;
 }
+
 .movie-card:hover {
   transform: translateY(-5px);
 }
+
 .poster {
   width: 100%;
   height: auto;
   object-fit: cover;
 }
+
 .info {
   padding: 1rem;
 }
+
 .info h2 {
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
   color: #fff;
 }
+
 .meta {
   font-size: 0.9rem;
   color: #999;
   margin-bottom: 0.5rem;
 }
+
 .overview {
   font-size: 0.9rem;
   color: #ccc;
