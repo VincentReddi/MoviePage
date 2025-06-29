@@ -21,12 +21,7 @@
         <h1>{{ selectedMovie.title }}</h1>
         <p><strong>Release Date:</strong> {{ selectedMovie.release_date }}</p>
         <p><strong>Overview:</strong> {{ selectedMovie.overview || 'No description available.' }}</p>
-        <div class="rating-section">
-          <label for="rating">Rate this movie:</label>
-          <input type="range" id="rating" v-model="rating" min="0" max="10" step="1" />
-          <p>Your rating: {{ rating }}/10</p>
-          <button @click="updateRating(selectedMovie.id)">Save Rating</button>
-        </div>
+        <button @click="addToList(selectedMovie.title)">Add to My List</button>
       </div>
     </div>
   </div>
@@ -43,7 +38,6 @@ export default {
     const results = ref([])
     const searched = ref(false)
     const selectedMovie = ref(null)
-    const rating = ref(0)
 
     const searchMovies = async () => {
       if (!query.value.trim()) return
@@ -66,33 +60,27 @@ export default {
 
     const closeDetail = () => {
       selectedMovie.value = null
-      rating.value = 0
     }
 
-    const updateRating = async (tmdbId) => {
-      if (!rating.value) {
-        alert('Please select a rating before saving.')
-        return
-      }
-
+    const addToList = async (movieTitle) => {
       try {
-        const response = await fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${tmdbId}/rating`, {
-          method: 'PUT',
+        const response = await fetch('https://popcornpilot-backend-new.onrender.com/api/movies', {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ rating: rating.value })
+          body: JSON.stringify({ title: movieTitle })
         })
 
         if (!response.ok) {
           const errorData = await response.json()
-          console.error('Error saving rating:', errorData)
-          alert('Failed to save rating. Please try again.')
+          console.error('Error adding movie to list:', errorData)
+          alert('Failed to add movie to your list. Please try again.')
           return
         }
 
-        alert('Rating saved successfully!')
+        alert('Movie added to your list successfully!')
       } catch (error) {
         console.error('Network error:', error)
-        alert('Error saving rating. Please check your connection.')
+        alert('Error adding movie to your list. Please check your connection.')
       }
     }
 
@@ -101,12 +89,11 @@ export default {
       results,
       searched,
       selectedMovie,
-      rating,
       searchMovies,
       getPosterUrl,
       openDetail,
       closeDetail,
-      updateRating,
+      addToList,
     }
   },
 }
@@ -216,25 +203,6 @@ export default {
   font-size: 1rem;
   color: #666;
   margin-bottom: 10px;
-}
-
-.rating-section {
-  margin-top: 20px;
-}
-
-.rating-section label {
-  font-size: 1rem;
-  color: #333;
-}
-
-.rating-section input {
-  margin: 10px 0;
-  width: 100%;
-}
-
-.rating-section p {
-  font-size: 1rem;
-  color: #666;
 }
 
 .back-button {
