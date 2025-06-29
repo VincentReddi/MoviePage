@@ -33,6 +33,13 @@ public class MovieController {
         }
     }
 
+
+    @PostMapping
+    public ResponseEntity<Movie> addMovie(@RequestBody Movie movie) {
+        Movie saved = movieRepository.save(movie);
+        return ResponseEntity.ok(saved);
+    }
+
     @GetMapping
     public List<Movie> getMovies() {
         List<Movie> movies = movieRepository.findAll();
@@ -42,14 +49,12 @@ public class MovieController {
                     .ifPresent(r -> movie.setPersonalRating(r.getValue()));
         }
 
+        System.out.println("Filme: " + movieRepository.findAll().size());
+
+
         return movies;
     }
 
-    @PostMapping
-    public ResponseEntity<Movie> addMovie(@RequestBody Movie movie) {
-        Movie saved = movieRepository.save(movie);
-        return ResponseEntity.ok(saved);
-    }
 
     @PutMapping("/{tmdbId}/rating")
     public Rating updateRating(@PathVariable String tmdbId, @RequestBody Double ratingValue) {
