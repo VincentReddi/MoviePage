@@ -3,15 +3,29 @@ import MovieList from './components/MovieList.vue'
 </script>
 
 <template>
-  <div>
-    <h1>PopcornPilot</h1>
+  <div id="app">
+    <h1>🎬 MoviePage</h1>
+    <MovieSearch />
     <MovieList />
   </div>
 </template>
 
-<style scoped>
-h1 {
-  text-align: center;
-  margin-top: 20px;
+<script>
+import MovieSearch from './components/MovieSearch.vue'
+import MovieList from './components/MovieList.vue'
+
+export default {
+  name: 'App',
+  components: {
+    MovieSearch,
+    MovieList
+  }
+}
+</script>
+
+<style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  padding: 2rem;
 }
 </style>
