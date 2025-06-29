@@ -1,12 +1,12 @@
 <template>
   <div class="search-container">
-    <h2>🎬 Filme suchen oder nach Genre filtern</h2>
+    <h2>🎬 Filme suchen oder entdecken</h2>
 
-    <!-- Eingabe für Titelsuche -->
+    <!-- Suchfeld -->
     <input v-model="query" @keyup.enter="searchMovies" placeholder="Film eingeben..." />
     <button @click="searchMovies">Suchen</button>
 
-    <!-- Dropdown für Genres -->
+    <!-- Genre Dropdown -->
     <select v-model="selectedGenre" @change="filterByGenre">
       <option value="">Genre auswählen</option>
       <option v-for="genre in genres" :key="genre.id" :value="genre.id">
@@ -14,12 +14,17 @@
       </option>
     </select>
 
-    <!-- Gefundene Filme -->
+    <!-- Zufallsvorschlag -->
+    <button @click="loadRandomMovie">🎲 Zufallsvorschlag</button>
+
+    <!-- Ergebnisliste -->
     <div v-if="results.length > 0" class="results">
       <div v-for="movie in results" :key="movie.id" class="movie-card">
         <img :src="getPosterUrl(movie.poster_path)" alt="Poster" />
         <div>
-          <h3>{{ movie.title }} ({{ movie.release_date?.slice(0, 4) || '–' }})</h3>
+          <h3 @click="openDetail(movie.id)" style="cursor: pointer;">
+            {{ movie.title }} ({{ movie.release_date?.slice(0, 4) || '–' }})
+          </h3>
           <p>{{ movie.overview || 'Keine Beschreibung verfügbar.' }}</p>
           <button @click="addToWatchlist(movie)">Zur Liste hinzufügen</button>
         </div>
@@ -27,96 +32,79 @@
     </div>
 
     <p v-else-if="searched">Keine Ergebnisse gefunden.</p>
-
-    <!-- Watchlist -->
-    <div v-if="watchlist.length > 0" class="watchlist">
-      <h3>🎞️ Meine Watchlist</h3>
-      <ul>
-        <li v-for="movie in watchlist" :key="movie.id">
-          {{ movie.title }}
-        </li>
-      </ul>
-    </div>
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      query: '',
-      selectedGenre: '',
-      results: [],
-      genres: [],
-      watchlist: [],
-      searched: false
-    };
-  },
-  async mounted() {
-    await this.loadGenres();
-  },
-  methods: {
-    async loadGenres() {
-      const apiKey = '3e1a60c002b082d8f881975fa6a5fe50';
-      const url = `https://api.themoviedb.org/3/genre/movie/list?api_key=${apiKey}&language=de`;
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useWatchlistStore } from '../stores/watchlist'
 
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        this.genres = data.genres;
-      } catch (err) {
-        console.error('Fehler beim Laden der Genres:', err);
-      }
-    },
-    async searchMovies() {
-      if (!this.query.trim()) return;
+const apiKey = '3e1a60c002b082d8f881975fa6a5fe50'
+const query = ref('')
+const selectedGenre = ref('')
+const genres = ref([])
+const results = ref([])
+const searched = ref(false)
+const router = useRouter()
+const store = useWatchlistStore()
 
-      const apiKey = '3e1a60c002b082d8f881975fa6a5fe50';
-      const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&language=de&query=${encodeURIComponent(this.query)}`;
+const getPosterUrl = (path) =>
+    path ? `https://image.tmdb.org/t/p/w200${path}` : 'https://via.placeholder.com/200x300?text=Kein+Bild'
 
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        this.results = data.results;
-        this.searched = true;
-      } catch (error) {
-        console.error('Fehler bei der API-Anfrage:', error);
-      }
-    },
-    async filterByGenre() {
-      if (!this.selectedGenre) return;
+const openDetail = (id) => {
+  router.push(`/film/${id}`)
+}
 
-      const apiKey = '3e1a60c002b082d8f881975fa6a5fe50';
-      const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&language=de&with_genres=${this.selectedGenre}`;
+const addToWatchlist = (movie) => {
+  store.addMovie(movie)
+}
 
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        this.results = data.results;
-        this.searched = true;
-      } catch (err) {
-        console.error('Fehler beim Filtern:', err);
-      }
-    },
-    getPosterUrl(path) {
-      return path
-          ? `https://image.tmdb.org/t/p/w200${path}`
-          : 'https://via.placeholder.com/200x300?text=Kein+Bild';
-    },
-    addToWatchlist(movie) {
-      if (!this.watchlist.find(m => m.id === movie.id)) {
-        this.watchlist.push(movie);
-      }
-    }
-  }
-};
+const searchMovies = async () => {
+  if (!query.value.trim()) return
+
+  const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&language=de&query=${encodeURIComponent(query.value)}`
+  const res = await fetch(url)
+  const data = await res.json()
+  results.value = data.results
+  searched.value = true
+}
+
+const loadGenres = async () => {
+  const url = `https://api.themoviedb.org/3/genre/movie/list?api_key=${apiKey}&language=de`
+  const res = await fetch(url)
+  const data = await res.json()
+  genres.value = data.genres
+}
+
+const filterByGenre = async () => {
+  if (!selectedGenre.value) return
+
+  const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&language=de&with_genres=${selectedGenre.value}`
+  const res = await fetch(url)
+  const data = await res.json()
+  results.value = data.results
+  searched.value = true
+}
+
+const loadRandomMovie = async () => {
+  const randomPage = Math.floor(Math.random() * 500) + 1
+  const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&language=de&page=${randomPage}&sort_by=popularity.desc`
+  const res = await fetch(url)
+  const data = await res.json()
+  results.value = [data.results[Math.floor(Math.random() * data.results.length)]]
+  searched.value = true
+}
+
+onMounted(loadGenres)
 </script>
 
 <style scoped>
 .search-container {
   padding: 20px;
 }
-input, select {
+input,
+select {
   padding: 10px;
   margin-right: 10px;
   width: 300px;
@@ -140,11 +128,5 @@ button {
 .movie-card img {
   width: 120px;
   border-radius: 5px;
-}
-.watchlist {
-  margin-top: 40px;
-  background: #f7f7f7;
-  padding: 15px;
-  border-radius: 10px;
 }
 </style>
