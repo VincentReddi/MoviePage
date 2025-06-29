@@ -7,6 +7,7 @@
         @input="searchMovies"
         class="search-input"
     />
+
     <div v-if="results.length" class="results">
       <div
           v-for="movie in results"
@@ -23,13 +24,40 @@
         <div class="info">
           <h2>{{ movie.title }}</h2>
           <p class="meta">
-            {{ movie.release_date?.slice(0, 4) || 'N/A' }} · ⭐ {{ movie.vote_average ? movie.vote_average.toFixed(1) : '–' }}
+            {{ movie.release_date?.slice(0, 4) || 'N/A' }} · ⭐
+            {{ movie.vote_average ? movie.vote_average.toFixed(1) : '–' }}
           </p>
           <p class="overview">{{ movie.overview.slice(0, 150) }}...</p>
         </div>
       </div>
     </div>
 
+    <!-- Gespeicherte Filme -->
+    <div v-if="savedMovies.length" class="saved-movies">
+      <h2 class="saved-title">📌 Meine Liste</h2>
+      <button @click="clearMovieList" class="clear-btn">🗑️ Liste leeren</button>
+      <div class="results">
+        <div
+            v-for="movie in savedMovies"
+            :key="movie.tmdbId"
+            class="movie-card"
+        >
+          <img
+              v-if="movie.posterPath"
+              :src="'https://image.tmdb.org/t/p/w300' + movie.posterPath"
+              :alt="movie.title"
+              class="poster"
+          />
+          <div class="info">
+            <h2>{{ movie.title }}</h2>
+            <p class="meta">Status: {{ movie.status }}</p>
+            <p class="overview">{{ movie.description.slice(0, 150) }}...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
     <div v-if="selectedMovie" class="modal" @click.self="selectedMovie = null">
       <div class="modal-content">
         <img
@@ -58,10 +86,23 @@ export default {
     return {
       query: '',
       results: [],
-      selectedMovie: null
+      selectedMovie: null,
+      savedMovies: []
     }
   },
+  async mounted() {
+    await this.fetchSavedMovies()
+  },
   methods: {
+    async fetchSavedMovies() {
+      try {
+        const res = await fetch('https://popcornpilot-backend-new.onrender.com/api/movies')
+        const data = await res.json()
+        this.savedMovies = data
+      } catch (e) {
+        console.error('Fehler beim Laden gespeicherter Filme:', e)
+      }
+    },
     async searchMovies() {
       if (this.query.length < 2) {
         this.results = []
@@ -104,6 +145,8 @@ export default {
 
         if (res.ok) {
           alert('Film wurde gespeichert!')
+          await this.fetchSavedMovies()
+          this.selectedMovie = null
         } else {
           alert('Fehler beim Speichern. Prüfe die Felder.')
         }
@@ -111,9 +154,21 @@ export default {
         console.error('Fehler beim Speichern:', e)
         alert('Verbindungsfehler oder ungültige Daten.')
       }
+    },
+    async clearMovieList() {
+      if (!confirm("Willst du wirklich alle Filme löschen?")) return;
+
+      try {
+        await fetch('https://popcornpilot-backend-new.onrender.com/api/movies', {
+          method: 'DELETE'
+        });
+        this.savedMovies = [];
+        alert("Liste wurde geleert.");
+      } catch (e) {
+        alert("Fehler beim Leeren der Liste.");
+        console.error(e);
+      }
     }
-
-
   }
 }
 </script>
@@ -136,15 +191,9 @@ export default {
   background-color: #1e1e1e;
   color: #fff;
   box-shadow: 0 2px 6px rgba(0,0,0,0.6);
-  transition: all 0.3s ease;
 }
 .search-input::placeholder {
   color: #aaa;
-}
-.search-input:focus {
-  outline: none;
-  border: 1px solid #007aff;
-  box-shadow: 0 0 0 3px rgba(0,122,255,0.3);
 }
 .results {
   display: grid;
@@ -160,8 +209,6 @@ export default {
   display: flex;
   flex-direction: column;
   transition: transform 0.2s ease;
-  text-decoration: none;
-  color: inherit;
   cursor: pointer;
 }
 .movie-card:hover {
@@ -190,72 +237,24 @@ export default {
   font-size: 0.9rem;
   color: #ccc;
 }
-
-/* Modal-Styling */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-.modal-content {
-  background: #1a1a1a;
-  border-radius: 1rem;
-  padding: 2rem;
-  max-width: 800px;
-  width: 90%;
-  display: flex;
-  flex-wrap: wrap;
-  color: #f0f0f0;
-}
-.modal-poster {
-  width: 250px;
-  border-radius: 0.75rem;
-  margin-right: 2rem;
-}
-.modal-info {
-  flex: 1;
-}
-.modal-info h2 {
+.saved-title {
+  margin-top: 3rem;
   font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+}
+.clear-btn {
   margin-bottom: 1rem;
-}
-.modal-overview {
-  margin-top: 1rem;
-  font-size: 1rem;
-  color: #ccc;
-}
-.close-btn {
-  margin-top: 1.5rem;
   padding: 0.5rem 1rem;
-  background: #007aff;
+  background-color: #ff3b30;
   color: white;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 1rem;
   cursor: pointer;
-  font-size: 1rem;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
-.close-btn:hover {
-  background: #005bb5;
-}
-.add-btn {
-  margin-top: 1.5rem;
-  margin-right: 1rem;
-  padding: 0.5rem 1rem;
-  background: #00c853;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-size: 1rem;
-}
-.add-btn:hover {
-  background: #009624;
+.clear-btn:hover {
+  background-color: #ff1f1a;
 }
 </style>

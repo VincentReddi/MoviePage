@@ -42,6 +42,8 @@ public class MovieController {
 
     @GetMapping
     public List<Movie> getMovies() {
+
+
         return movieRepository.findAll();
     }
 
@@ -50,6 +52,11 @@ public class MovieController {
     public Rating updateRating(@PathVariable String tmdbId, @RequestBody Double ratingValue) {
         Rating rating = new Rating(tmdbId, ratingValue);
         return ratingRepository.save(rating);
+    }
+
+    @DeleteMapping
+    public void deleteAllMovies() {
+        movieRepository.deleteAll();
     }
 
 
