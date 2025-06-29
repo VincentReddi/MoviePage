@@ -1,88 +1,66 @@
 <template>
-  <div>
-    <h2>Filmliste</h2>
-    <div v-if="movies.length === 0">Lade Filme...</div>
-    <div v-else class="movie-card" v-for="movie in movies" :key="movie.tmdbId">
-      <img :src="movie.posterUrl" :alt="movie.title" width="150" />
-      <h3>{{ movie.title }}</h3>
-      <p><strong>Genre:</strong> {{ movie.genre }}</p>
-      <p><strong>Plattform:</strong> {{ movie.platform }}</p>
-      <p><strong>Status:</strong> {{ movie.status }}</p>
-      <p><strong>Meine Bewertung:</strong> {{ movie.personalRating || "Keine" }}/10</p>
+  <div class="movie-list">
+    <h2>🎬 Gespeicherte Filme</h2>
 
-      <input
-          type="number"
-          v-model="ratingInputs[movie.tmdbId]"
-          placeholder="Neue Bewertung (z. B. 4.5)"
-          step="0.1"
-          min="0"
-          max="10"
-      />
-      <button @click="updateRating(movie.tmdbId)">Speichern</button>
+    <div v-if="movies.length" class="movie-grid">
+      <div v-for="movie in movies" :key="movie.tmdbId" class="movie-card">
+        <img :src="'https://image.tmdb.org/t/p/w300' + movie.posterPath" :alt="movie.title" />
+        <h3>{{ movie.title }}</h3>
+        <p>Status: {{ movie.status }}</p>
+      </div>
     </div>
+
+    <p v-else class="no-movies">Noch keine Filme gespeichert.</p>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'PopcornPilot',
+  name: 'MovieList',
   data() {
     return {
-      movies: [],
-      ratingInputs: {}
-    };
+      movies: []
+    }
   },
-  mounted() {
-    fetch('https://popcornpilot-backend-new.onrender.com/api/movies')
-        .then(response => response.json())
-        .then(data => {
-          this.movies = data;
-        });
-  },
-  methods: {
-    updateRating(tmdbId) {
-      const value = this.ratingInputs[tmdbId];
-      if (!value) return;
-
-      fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${tmdbId}/rating`, {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(value)
-      })
-          .then(() => alert("Bewertung gespeichert!"))
-          .catch(() => alert("Fehler beim Speichern."));
+  async mounted() {
+    try {
+      const res = await fetch('https://popcornpilot-backend-new.onrender.com/api/movies')
+      const data = await res.json()
+      this.movies = data
+    } catch (err) {
+      console.error('Fehler beim Laden der Filme:', err)
     }
   }
-};
+}
 </script>
 
 <style scoped>
+.movie-list {
+  padding: 2rem;
+  color: white;
+  max-width: 1000px;
+  margin: auto;
+}
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1.5rem;
+}
 .movie-card {
-  border: 1px solid #ddd;
-  padding: 16px;
-  margin: 12px auto;
-  border-radius: 8px;
-  background-color: #1e1e1e;
-  color: #f0f0f0;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  text-align: left;
+  background: #222;
+  border-radius: 1rem;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
-
 .movie-card img {
-  width: 100px;
-  float: left;
-  margin-right: 16px;
+  width: 100%;
+  border-radius: 0.75rem;
+  margin-bottom: 0.5rem;
 }
-
-.movie-card h3 {
-  margin-top: 0;
-}
-
-.movie-card::after {
-  content: "";
-  display: block;
-  clear: both;
+.no-movies {
+  text-align: center;
+  margin-top: 2rem;
+  color: #bbb;
 }
 </style>
