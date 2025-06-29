@@ -55,7 +55,6 @@ const addToWatchlist = (movie) => {
 }
 
 const searchMovies = async () => {
-  console.log("Suchbegriff:", query.value)
   if (!query.value.trim()) return
   const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&language=de&query=${encodeURIComponent(query.value)}`
   const res = await fetch(url)
@@ -89,17 +88,11 @@ const loadRandomMovie = async () => {
   searched.value = true
 }
 
-onMounted(() => {
-  loadGenres()
-})
+onMounted(loadGenres)
 </script>
 
 <style scoped>
 .search-container {
-  display: block !important;
-  background: #111;
-  color: white;
-
   padding: 20px;
 }
 input,

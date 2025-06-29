@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import SearchMovies from '../components/SearchMovies.vue'
+import HomeView from '../components/HomeView.vue'
 
 const routes = [
     {
         path: '/',
         name: 'Home',
-        component: SearchMovies // Ensure the search bar is displayed on the homepage
+        component: HomeView // Default route points to HomeView.vue
     },
     {
         path: '/film/:id',
