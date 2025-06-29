@@ -1,28 +1,29 @@
 // frontend/src/router/index.js
+
 import { createRouter, createWebHistory } from 'vue-router'
-import SearchMovies from '../components/SearchMovies.vue'
+import HomeView from '../components/HomeView.vue'
 
 const routes = [
     {
         path: '/',
         name: 'Home',
-        component: SearchMovies, // Stellt sicher, dass die Suchfunktion auf der Startseite angezeigt wird
+        component: HomeView
     },
     {
         path: '/film/:id',
         name: 'FilmDetail',
-        component: () => import('../components/MovieDetailView.vue'), // Beispiel für eine Detailseite
+        component: () => import('../components/MovieDetailView.vue')
     },
     {
         path: '/liste',
         name: 'Watchlist',
-        component: () => import('../components/WatchlistView.vue'), // Beispiel für die Watchlist-Seite
-    },
+        component: () => import('../components/WatchlistView.vue')
+    }
 ]
 
 const router = createRouter({
     history: createWebHistory(),
-    routes,
+    routes
 })
 
 export default router
