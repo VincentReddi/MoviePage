@@ -1,7 +1,10 @@
 <template>
   <div class="home-view">
-    <div v-if="!selectedMovie" class="search-bar">
+    <div class="search-bar">
       <h1>🎥 Discover Movies</h1>
+      <button @click="writeTestToDatabase">Write TEST to Database</button>
+    </div>
+    <div v-if="!selectedMovie" class="search-bar">
       <input v-model="query" @input="searchMovies" placeholder="Search for movies..." />
       <ul v-if="results.length" class="results">
         <li v-for="movie in results" :key="movie.id" class="movie-card" @click="openDetail(movie.id)">
@@ -66,21 +69,43 @@ export default {
       try {
         const response = await fetch('https://popcornpilot-backend-new.onrender.com/api/movies', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title: movieTitle })
-        })
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({title: movieTitle})
+        });
 
         if (!response.ok) {
-          const errorData = await response.json()
-          console.error('Error adding movie to list:', errorData)
-          alert('Failed to add movie to your list. Please try again.')
-          return
+          const errorData = await response.json();
+          console.error('Error adding movie to list:', errorData);
+          alert(`Failed to add movie to your list. Error: ${errorData.message || 'Unknown error'}`);
+          return;
         }
 
-        alert('Movie added to your list successfully!')
+        alert('Movie added to your list successfully!');
       } catch (error) {
-        console.error('Network error:', error)
-        alert('Error adding movie to your list. Please check your connection.')
+        console.error('Network error:', error);
+        alert(`Error adding movie to your list. Network error: ${error.message}`);
+      }
+    }
+
+    const writeTestToDatabase = async () => {
+      try {
+        const response = await fetch('https://popcornpilot-backend-new.onrender.com/api/movies', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({title: 'TEST'})
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Error writing TEST to database:', errorData);
+          alert(`Failed to write TEST to database. Error: ${errorData.message || 'Unknown error'}`);
+          return;
+        }
+
+        alert('TEST written to database successfully!');
+      } catch (error) {
+        console.error('Network error:', error);
+        alert(`Error writing TEST to database. Network error: ${error.message}`);
       }
     }
 
@@ -94,6 +119,7 @@ export default {
       openDetail,
       closeDetail,
       addToList,
+      writeTestToDatabase,
     }
   },
 }
@@ -218,4 +244,17 @@ export default {
 .back-button:hover {
   background: #0056b3;
 }
-</style>n
+
+button {
+  padding: 10px 20px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0056b3;
+}
+</style>
