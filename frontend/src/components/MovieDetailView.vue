@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted} from 'vue'
 import { useRoute } from 'vue-router'
 import { useWatchlistStore } from '../stores/watchlist.js'
 

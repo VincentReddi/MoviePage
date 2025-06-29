@@ -1,13 +1,11 @@
-// frontend/src/router/index.js
-
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../components/HomeView.vue'
+import SearchMovies from '../components/SearchMovies.vue'
 
 const routes = [
     {
         path: '/',
         name: 'Home',
-        component: HomeView
+        component: SearchMovies // Ensure the search bar is displayed on the homepage
     },
     {
         path: '/film/:id',

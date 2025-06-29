@@ -1,7 +1,7 @@
 <template>
   <div class="watchlist">
     <h1>📋 Meine Liste</h1>
-    <div v-if="watchlist.length === 0">Noch keine Filme in der Liste.</div>
+    <div v-if="!watchlist || watchlist.length === 0">Noch keine Filme in der Liste.</div>
     <div v-for="movie in watchlist" :key="movie.id" class="movie-card">
       <h3>{{ movie.title }}</h3>
       <label>Status:
