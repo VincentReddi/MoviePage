@@ -112,6 +112,8 @@ export default {
         alert('Verbindungsfehler oder ungültige Daten.')
       }
     }
+
+
   }
 }
 </script>

@@ -1,5 +1,6 @@
 package com.example.moviesite;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,20 @@ public class MovieController {
     public MovieController(RatingRepository ratingRepository, MovieRepository movieRepository) {
         this.ratingRepository = ratingRepository;
         this.movieRepository = movieRepository;
+    }
+
+    @PostConstruct
+    public void init() {
+        if (movieRepository.findAll().isEmpty()) {
+            Movie example = new Movie(
+                    "Interstellar", "Sci-Fi", "Netflix",
+                    "Ein episches Sci-Fi-Abenteuer über Zeit und Raum.",
+                    "157336",  // TMDb-ID
+                    "https://image.tmdb.org/t/p/original/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+                    "Geplant"
+            );
+            movieRepository.save(example);
+        }
     }
 
     @GetMapping
@@ -41,4 +56,6 @@ public class MovieController {
         Rating rating = new Rating(tmdbId, ratingValue);
         return ratingRepository.save(rating);
     }
+
+
 }
