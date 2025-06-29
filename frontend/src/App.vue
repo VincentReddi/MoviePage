@@ -1,19 +1,29 @@
 <script setup>
-import MovieList from './components/MovieList.vue'
-import SearchMovies from './components/SearchMovies.vue'
 </script>
 
 <template>
   <div>
     <h1>PopcornPilot</h1>
-    <SearchMovies />
-    <MovieList />
+    <nav>
+      <router-link to="/">Start</router-link> |
+      <router-link to="/liste">Meine Liste</router-link>
+    </nav>
+    <router-view />
   </div>
 </template>
 
 <style scoped>
 h1 {
   text-align: center;
-  margin-top: 20px;
+  margin: 20px 0;
+}
+nav {
+  text-align: center;
+  margin-bottom: 20px;
+}
+nav a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: #333;
 }
 </style>
