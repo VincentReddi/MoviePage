@@ -89,7 +89,10 @@ export default {
         posterPath: movie.poster_path,
         releaseDate: movie.release_date,
         description: movie.overview,
-        status: 'geplant'
+        status: 'geplant',
+        genre: 'Unbekannt',
+        platform: 'Unbekannt',
+        tmdbId: movie.id.toString()
       }
 
       try {
