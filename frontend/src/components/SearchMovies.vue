@@ -2,22 +2,16 @@
   <div class="search-container">
     <h2>🎬 Filme suchen oder entdecken</h2>
 
-    <!-- Suchfeld -->
     <input v-model="query" @keyup.enter="searchMovies" placeholder="Film eingeben..." />
     <button @click="searchMovies">Suchen</button>
 
-    <!-- Genre Dropdown -->
     <select v-model="selectedGenre" @change="filterByGenre">
       <option value="">Genre auswählen</option>
-      <option v-for="genre in genres" :key="genre.id" :value="genre.id">
-        {{ genre.name }}
-      </option>
+      <option v-for="genre in genres" :key="genre.id" :value="genre.id">{{ genre.name }}</option>
     </select>
 
-    <!-- Zufallsvorschlag -->
     <button @click="loadRandomMovie">🎲 Zufallsvorschlag</button>
 
-    <!-- Ergebnisliste -->
     <div v-if="results.length > 0" class="results">
       <div v-for="movie in results" :key="movie.id" class="movie-card">
         <img :src="getPosterUrl(movie.poster_path)" alt="Poster" />
