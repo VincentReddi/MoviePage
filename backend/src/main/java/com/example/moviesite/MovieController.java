@@ -42,17 +42,7 @@ public class MovieController {
 
     @GetMapping
     public List<Movie> getMovies() {
-        List<Movie> movies = movieRepository.findAll();
-
-        for (Movie movie : movies) {
-            ratingRepository.findById(movie.getTmdbId())
-                    .ifPresent(r -> movie.setPersonalRating(r.getValue()));
-        }
-
-        System.out.println("Filme: " + movieRepository.findAll().size());
-
-
-        return movies;
+        return movieRepository.findAll();
     }
 
 
