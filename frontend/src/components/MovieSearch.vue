@@ -1,8 +1,5 @@
 <template>
   <div class="movie-search">
-    <!-- Zufallsfilm-Button -->
-    <button @click="loadRandomMovie" class="random-btn">🎲 Zufallsfilm anzeigen</button>
-
     <!-- Suchleiste -->
     <input
         type="text"
@@ -11,6 +8,14 @@
         @input="searchMovies"
         class="search-input"
     />
+
+    <!-- Genre-Dropdown -->
+    <select v-model="selectedGenre" @change="searchMovies" class="genre-select">
+      <option value="">🎬 Genre auswählen</option>
+      <option v-for="genre in genres" :key="genre.id" :value="genre.id">
+        {{ genre.name }}
+      </option>
+    </select>
 
     <!-- Suchergebnisse -->
     <div v-if="results.length" class="results">
@@ -55,8 +60,22 @@
           />
           <div class="info">
             <h2>{{ movie.title }}</h2>
-            <p class="meta">Status: {{ movie.status }}</p>
-            <p class="overview">{{ movie.description?.slice(0, 150) }}...</p>
+            <label>Status:
+              <select v-model="movie.status" @change="updateMovieStatus(movie)">
+                <option value="Geplant">Geplant</option>
+                <option value="Geschaut">Geschaut</option>
+              </select>
+            </label>
+            <label>Bewertung:
+              <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  v-model.number="movie.rating"
+                  @change="updateMovieRating(movie)"
+              />
+            </label>
+            <p class="overview">{{ movie.description?.slice(0, 150) || 'Keine Beschreibung vorhanden...' }}</p>
           </div>
         </div>
       </div>
@@ -90,42 +109,63 @@ export default {
   data() {
     return {
       query: '',
+      selectedGenre: '',
+      genres: [],
       results: [],
       selectedMovie: null,
       savedMovies: []
-    };
+    }
   },
   async mounted() {
-    await this.fetchSavedMovies();
+    await this.fetchSavedMovies()
+    await this.fetchGenres()
   },
   methods: {
     async fetchSavedMovies() {
       try {
-        const res = await fetch('https://popcornpilot-backend-new.onrender.com/api/movies');
-        const data = await res.json();
-        this.savedMovies = data;
+        const res = await fetch('https://popcornpilot-backend-new.onrender.com/api/movies')
+        const data = await res.json()
+        this.savedMovies = data
       } catch (e) {
-        console.error('Fehler beim Laden gespeicherter Filme:', e);
+        console.error('Fehler beim Laden gespeicherter Filme:', e)
+      }
+    },
+    async fetchGenres() {
+      const apiKey = '3e1a60c002b082d8f881975fa6a5fe50'
+      try {
+        const response = await fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${apiKey}&language=de`)
+        const data = await response.json()
+        this.genres = data.genres
+      } catch (e) {
+        console.error('Fehler beim Laden der Genres:', e)
       }
     },
     async searchMovies() {
       if (this.query.length < 2) {
-        this.results = [];
-        return;
+        this.results = []
+        return
       }
-      const apiKey = '3e1a60c002b082d8f881975fa6a5fe50';
-      const url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(this.query)}&api_key=${apiKey}&language=de`;
+
+      const apiKey = '3e1a60c002b082d8f881975fa6a5fe50'
+      let url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(this.query)}&api_key=${apiKey}&language=de`
+
       try {
-        const response = await fetch(url);
-        const data = await response.json();
-        this.results = data.results;
+        const response = await fetch(url)
+        let data = await response.json()
+
+        // Wenn Genre gefiltert wird
+        if (this.selectedGenre) {
+          data.results = data.results.filter(movie => movie.genre_ids?.includes(Number(this.selectedGenre)))
+        }
+
+        this.results = data.results
       } catch (error) {
-        console.error('Fehler bei der TMDb-Suche:', error);
-        this.results = [];
+        console.error('Fehler bei der TMDb-Suche:', error)
+        this.results = []
       }
     },
     selectMovie(movie) {
-      this.selectedMovie = movie;
+      this.selectedMovie = movie
     },
     async addToList(movie) {
       const payload = {
@@ -136,59 +176,68 @@ export default {
         status: 'Geplant',
         genre: 'Unbekannt',
         platform: 'Unbekannt',
-        tmdbId: movie.id.toString()
-      };
+        rating: 0
+      }
 
       try {
         const res = await fetch('https://popcornpilot-backend-new.onrender.com/api/movies', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
-        });
+        })
 
         if (res.ok) {
-          alert('Film wurde gespeichert!');
-          await this.fetchSavedMovies();
-          this.selectedMovie = null;
+          alert('Film wurde gespeichert!')
+          await this.fetchSavedMovies()
+          this.selectedMovie = null
         } else {
-          alert('Fehler beim Speichern.');
+          alert('Fehler beim Speichern.')
         }
       } catch (e) {
-        alert('Verbindungsfehler oder ungültige Daten.');
-        console.error(e);
+        alert('Verbindungsfehler oder ungültige Daten.')
+        console.error(e)
       }
     },
     async clearMovieList() {
       if (!confirm("Willst du wirklich alle Filme löschen?")) return;
+
       try {
         await fetch('https://popcornpilot-backend-new.onrender.com/api/movies', {
           method: 'DELETE'
         });
-        this.savedMovies = [];
-        alert("Liste wurde geleert.");
+        this.savedMovies = []
+        alert("Liste wurde geleert.")
       } catch (e) {
-        alert("Fehler beim Leeren der Liste.");
-        console.error(e);
+        alert("Fehler beim Leeren der Liste.")
+        console.error(e)
       }
     },
-    async loadRandomMovie() {
-      const apiKey = '3e1a60c002b082d8f881975fa6a5fe50';
-      const randomPage = Math.floor(Math.random() * 500) + 1;
-      const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&language=de&page=${randomPage}`;
-
+    async updateMovieStatus(movie) {
       try {
-        const res = await fetch(url);
-        const data = await res.json();
-        const randomIndex = Math.floor(Math.random() * data.results.length);
-        const randomMovie = data.results[randomIndex];
-        this.results = [randomMovie]; // zeigt ihn direkt an
+        await fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${movie.id}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(movie.status)
+        })
       } catch (e) {
-        alert("Fehler beim Laden eines Zufallsfilms.");
-        console.error(e);
+        alert('Fehler beim Aktualisieren des Status')
+        console.error(e)
+      }
+    },
+    async updateMovieRating(movie) {
+      try {
+        await fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${movie.id}/rating`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(movie.rating)
+        })
+      } catch (e) {
+        alert('Fehler beim Aktualisieren der Bewertung')
+        console.error(e)
       }
     }
   }
-};
+}
 </script>
 
 <style scoped>
@@ -198,9 +247,11 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
   color: #f0f0f0;
+  box-sizing: border-box;
 }
-.search-input {
+.search-input, .genre-select {
   width: 100%;
+  margin-bottom: 1rem;
   padding: 0.75rem 1rem;
   font-size: 1rem;
   border: none;
@@ -208,31 +259,9 @@ export default {
   background-color: #1e1e1e;
   color: #fff;
   box-shadow: 0 2px 6px rgba(0,0,0,0.6);
-  margin-top: 1rem;
 }
-.random-btn {
-  margin-bottom: 1rem;
-  padding: 0.5rem 1rem;
-  background-color: #5c6bc0;
-  color: white;
-  border: none;
-  border-radius: 1rem;
-  cursor: pointer;
-  font-weight: bold;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-}
-.random-btn:hover {
-  background-color: #3f51b5;
-}
-.clear-btn {
-  margin-bottom: 1rem;
-  padding: 0.5rem 1rem;
-  background-color: #ff3b30;
-  color: white;
-  border: none;
-  border-radius: 1rem;
-  cursor: pointer;
-  font-weight: bold;
+.genre-select {
+  margin-top: 0.5rem;
 }
 .results {
   display: grid;
@@ -281,6 +310,20 @@ export default {
   font-size: 1.5rem;
   font-weight: 600;
   color: #fff;
+}
+.clear-btn {
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #ff3b30;
+  color: white;
+  border: none;
+  border-radius: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+.clear-btn:hover {
+  background-color: #ff1f1a;
 }
 .modal {
   position: fixed;
