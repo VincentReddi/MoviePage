@@ -150,11 +150,11 @@ export default {
           await this.fetchSavedMovies()
           this.selectedMovie = null
         } else {
-          alert('Fehler beim Speichern. Prüfe die Felder.')
+          alert('Fehler beim Speichern.')
         }
       } catch (e) {
-        console.error('Fehler beim Speichern:', e)
         alert('Verbindungsfehler oder ungültige Daten.')
+        console.error(e)
       }
     },
     async clearMovieList() {
@@ -164,16 +164,51 @@ export default {
         await fetch('https://popcornpilot-backend-new.onrender.com/api/movies', {
           method: 'DELETE'
         });
-        this.savedMovies = [];
-        alert("Liste wurde geleert.");
+        this.savedMovies = []
+        alert("Liste wurde geleert.")
       } catch (e) {
-        alert("Fehler beim Leeren der Liste.");
-        console.error(e);
+        alert("Fehler beim Leeren der Liste.")
+        console.error(e)
       }
     }
   }
 }
 </script>
+
+<style scoped>
+/* ... dein gesamtes Styling bleibt unverändert ... */
+
+.clear-btn {
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #ff3b30;
+  color: white;
+  border: none;
+  border-radius: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+.clear-btn:hover {
+  background-color: #ff1f1a;
+}
+
+.clear-btn {
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #ff3b30;
+  color: white;
+  border: none;
+  border-radius: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+.clear-btn:hover {
+  background-color: #ff1f1a;}
+
+</style>
+
 
 <style scoped>
 .movie-search {
