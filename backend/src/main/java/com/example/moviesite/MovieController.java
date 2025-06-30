@@ -27,7 +27,8 @@ public class MovieController {
     }
 
     @DeleteMapping
-    public void deleteAll() {
+    public void deleteAllMovies() {
         movieRepository.deleteAll();
     }
+
 }
