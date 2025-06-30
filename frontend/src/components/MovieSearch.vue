@@ -9,6 +9,14 @@
         class="search-input"
     />
 
+    <!-- Genre-Dropdown -->
+    <select v-model="selectedGenre" @change="searchMovies" class="genre-select">
+      <option value="">🎬 Genre auswählen</option>
+      <option v-for="genre in genres" :key="genre.id" :value="genre.id">
+        {{ genre.name }}
+      </option>
+    </select>
+
     <!-- Suchergebnisse -->
     <div v-if="results.length" class="results">
       <div
@@ -29,8 +37,7 @@
             {{ movie.release_date?.slice(0, 4) || 'N/A' }} · ⭐
             {{ movie.vote_average ? movie.vote_average.toFixed(1) : '–' }}
           </p>
-          <p class="overview">{{ movie.description?.slice(0, 150) || 'Keine Beschreibung vorhanden...' }}</p>
-
+          <p class="overview">{{ movie.overview?.slice(0, 150) }}...</p>
         </div>
       </div>
     </div>
@@ -53,27 +60,22 @@
           />
           <div class="info">
             <h2>{{ movie.title }}</h2>
-            <p class="meta">Status: {{ movie.status || '–' }}</p>
-            <p class="overview">{{ movie.description?.slice(0, 150) || 'Keine Beschreibung vorhanden...' }}</p>
-
-
-            <!-- Status ändern -->
-            <div class="status">
-              <label>Status ändern:</label>
+            <label>Status:
               <select v-model="movie.status" @change="updateMovieStatus(movie)">
                 <option value="Geplant">Geplant</option>
                 <option value="Geschaut">Geschaut</option>
               </select>
-            </div>
-
-            <!-- Bewertung -->
-            <div class="rating">
-              <label>Bewertung:</label>
-              <select v-model="movie.rating" @change="updateMovieRating(movie)">
-                <option disabled value="">–</option>
-                <option v-for="n in 10" :key="n" :value="n">{{ n }}</option>
-              </select>
-            </div>
+            </label>
+            <label>Bewertung:
+              <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  v-model.number="movie.rating"
+                  @change="updateMovieRating(movie)"
+              />
+            </label>
+            <p class="overview">{{ movie.description?.slice(0, 150) || 'Keine Beschreibung vorhanden...' }}</p>
           </div>
         </div>
       </div>
@@ -91,7 +93,7 @@
         <div class="modal-info">
           <h2>{{ selectedMovie.title }}</h2>
           <p><strong>Veröffentlichung:</strong> {{ selectedMovie.release_date }}</p>
-          <p><strong>Bewertung:</strong> ⭐ {{ selectedMovie.vote_average ? selectedMovie.vote_average.toFixed(1) : '–' }}</p>
+          <p><strong>Bewertung:</strong> ⭐ {{ selectedMovie.vote_average?.toFixed(1) || '–' }}</p>
           <p class="modal-overview">{{ selectedMovie.overview }}</p>
           <button @click="addToList(selectedMovie)" class="add-btn">Zur Liste hinzufügen</button>
           <button @click="selectedMovie = null" class="close-btn">Schließen</button>
@@ -107,6 +109,8 @@ export default {
   data() {
     return {
       query: '',
+      selectedGenre: '',
+      genres: [],
       results: [],
       selectedMovie: null,
       savedMovies: []
@@ -114,6 +118,7 @@ export default {
   },
   async mounted() {
     await this.fetchSavedMovies()
+    await this.fetchGenres()
   },
   methods: {
     async fetchSavedMovies() {
@@ -125,6 +130,16 @@ export default {
         console.error('Fehler beim Laden gespeicherter Filme:', e)
       }
     },
+    async fetchGenres() {
+      const apiKey = '3e1a60c002b082d8f881975fa6a5fe50'
+      try {
+        const response = await fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${apiKey}&language=de`)
+        const data = await response.json()
+        this.genres = data.genres
+      } catch (e) {
+        console.error('Fehler beim Laden der Genres:', e)
+      }
+    },
     async searchMovies() {
       if (this.query.length < 2) {
         this.results = []
@@ -132,11 +147,17 @@ export default {
       }
 
       const apiKey = '3e1a60c002b082d8f881975fa6a5fe50'
-      const url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(this.query)}&api_key=${apiKey}&language=de`
+      let url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(this.query)}&api_key=${apiKey}&language=de`
 
       try {
         const response = await fetch(url)
-        const data = await response.json()
+        let data = await response.json()
+
+        // Wenn Genre gefiltert wird
+        if (this.selectedGenre) {
+          data.results = data.results.filter(movie => movie.genre_ids?.includes(Number(this.selectedGenre)))
+        }
+
         this.results = data.results
       } catch (error) {
         console.error('Fehler bei der TMDb-Suche:', error)
@@ -155,7 +176,7 @@ export default {
         status: 'Geplant',
         genre: 'Unbekannt',
         platform: 'Unbekannt',
-        rating: null
+        rating: 0
       }
 
       try {
@@ -199,7 +220,7 @@ export default {
           body: JSON.stringify(movie.status)
         })
       } catch (e) {
-        alert("Fehler beim Aktualisieren des Status.")
+        alert('Fehler beim Aktualisieren des Status')
         console.error(e)
       }
     },
@@ -211,7 +232,7 @@ export default {
           body: JSON.stringify(movie.rating)
         })
       } catch (e) {
-        alert("Fehler beim Aktualisieren der Bewertung.")
+        alert('Fehler beim Aktualisieren der Bewertung')
         console.error(e)
       }
     }
@@ -228,8 +249,9 @@ export default {
   color: #f0f0f0;
   box-sizing: border-box;
 }
-.search-input {
+.search-input, .genre-select {
   width: 100%;
+  margin-bottom: 1rem;
   padding: 0.75rem 1rem;
   font-size: 1rem;
   border: none;
@@ -238,8 +260,8 @@ export default {
   color: #fff;
   box-shadow: 0 2px 6px rgba(0,0,0,0.6);
 }
-.search-input::placeholder {
-  color: #aaa;
+.genre-select {
+  margin-top: 0.5rem;
 }
 .results {
   display: grid;
@@ -352,24 +374,5 @@ export default {
 }
 .close-btn:hover {
   background-color: #333;
-}
-
-.status,
-.rating {
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-}
-.status label,
-.rating label {
-  margin-right: 0.5rem;
-  color: #ccc;
-}
-.status select,
-.rating select {
-  padding: 0.25rem 0.5rem;
-  background-color: #333;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
 }
 </style>
