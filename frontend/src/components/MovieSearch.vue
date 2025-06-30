@@ -181,20 +181,19 @@ export default {
     },
     async updateMovieStatus(movie) {
       try {
-        const res = await fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${movie.tmdbId}/status`, {
+        const res = await fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${movie.id}/status`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(movie.status)
-        })
+        });
 
-        if (!res.ok) {
-          throw new Error("Update fehlgeschlagen")
-        }
+        if (!res.ok) throw new Error('Update fehlgeschlagen');
       } catch (e) {
-        alert("Fehler beim Aktualisieren des Status")
-        console.error(e)
+        alert("Fehler beim Aktualisieren des Status");
+        console.error(e);
       }
     }
+
   }
 }
 </script>
