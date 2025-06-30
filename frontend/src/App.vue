@@ -1,7 +1,3 @@
-<script setup>
-import MovieList from './components/MovieList.vue'
-</script>
-
 <template>
   <div id="app">
     <h1 class="title">🍿 PopcornPilot</h1>
