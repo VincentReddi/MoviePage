@@ -80,7 +80,7 @@
                   @change="updateMovieRating(movie)"
               />
             </label>
-            <p class="overview">{{ movie.description?.slice(0, 150) || 'Keine Beschreibung vorhanden...' }}</p>
+            <p class="overview">{{ movie.description?.slice(0, 150) || '' }}</p>
           </div>
         </div>
       </div>
