@@ -259,7 +259,7 @@ export default {
   max-width: 1200px;
   margin: auto;
   color: #111;
-  background-color: #f4f4f4;
+  background-color: #ffffff; /* Weiß nur im Light Mode */
   transition: background-color 0.4s ease, color 0.4s ease;
 }
 
