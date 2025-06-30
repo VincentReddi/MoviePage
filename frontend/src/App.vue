@@ -2,19 +2,16 @@
   <div id="app">
     <h1 class="title">🍿 PopcornPilot</h1>
     <MovieSearch />
-    <MovieList />
   </div>
 </template>
 
 <script>
 import MovieSearch from './components/MovieSearch.vue'
-import MovieList from './components/MovieList.vue'
 
 export default {
   name: 'App',
   components: {
-    MovieSearch,
-    MovieList
+    MovieSearch
   }
 }
 </script>
