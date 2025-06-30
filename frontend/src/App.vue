@@ -17,7 +17,7 @@ import MovieList from "./components/MovieList.vue";
 
 export default {
   components: {
-    MovieList,
+    //MovieList,
     LoginPage,
     MovieSearch
   },
