@@ -5,9 +5,6 @@
       {{ darkMode ? '☀️ Light Mode' : '🌙 Dark Mode' }}
     </button>
 
-    <!-- Logo mit Schlagschatten -->
-    <div class="logo">🍿 PopcornPilot</div>
-
     <!-- Suchleiste -->
     <input
         type="text"
@@ -83,6 +80,7 @@
                     @change="updateMovieRating(movie)"
                 />
               </label>
+              <!-- ❌ Einzel-Löschbutton entfernt -->
             </div>
           </div>
         </div>
@@ -129,22 +127,11 @@ export default {
     await this.fetchSavedMovies();
     await this.fetchGenres();
     this.loadDarkModePreference();
-
-    // body-Klasse setzen bei Start
-    if (this.darkMode) {
-      document.body.classList.add('dark-mode');
-    }
   },
   methods: {
     toggleDarkMode() {
       this.darkMode = !this.darkMode;
       localStorage.setItem('darkMode', this.darkMode);
-
-      if (this.darkMode) {
-        document.body.classList.add('dark-mode');
-      } else {
-        document.body.classList.remove('dark-mode');
-      }
     },
     loadDarkModePreference() {
       const savedMode = localStorage.getItem('darkMode');
@@ -272,28 +259,164 @@ export default {
   max-width: 1200px;
   margin: auto;
   color: #111;
+  background-color: #ffffff; /* Weiß nur im Light Mode */
   transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 .dark-mode {
-  background-color: transparent;
+  background-color: #0e0e0e;
   color: #e0e0e0;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-/* Logo mit Schlagschatten */
-.logo {
-  font-size: 3rem;
+.search-input,
+.genre-select {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: none;
+  background: #eaeaea;
+  color: #111;
+}
+
+.dark-mode .search-input,
+.dark-mode .genre-select {
+  background: #222;
+  border: 1px solid #555;
+  color: #fff;
+}
+
+.results {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.movie-card {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  width: 240px;
+}
+
+.dark-mode .movie-card {
+  background: #1c1c1c;
+  border: 1px solid #0ff;
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.dark-mode .movie-card:hover {
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.poster {
+  width: 100%;
+  height: 360px;
+  object-fit: cover;
+}
+
+.info {
+  padding: 1rem;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+input[type="number"] {
+  width: 60px;
+  padding: 0.3rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.dark-mode input[type="number"] {
+  background: #333;
+  color: #fff;
+  border: 1px solid #555;
+}
+
+.clear-btn {
+  margin-bottom: 1rem;
+  background: #b30000;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.clear-btn:hover {
+  background: #990000;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  color: #000;
+  max-width: 800px;
+  display: flex;
+  gap: 2rem;
+}
+
+.dark-mode .modal-content {
+  background: #1a1a1a;
+  color: white;
+  border: 1px solid #444;
+}
+
+.modal-poster {
+  width: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.add-btn,
+.close-btn {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
   font-weight: bold;
-  text-align: center;
-  margin-bottom: 2rem;
-  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
 }
 
-.dark-mode .logo {
-  text-shadow: 0 4px 12px rgba(255, 255, 255, 0.1), 0 0 24px rgba(0, 255, 255, 0.2);
+.add-btn {
+  background: #28a745;
+  color: white;
 }
 
-/* Theme Toggle Button */
+.dark-mode .add-btn {
+  background: #00cc88;
+  box-shadow: 0 0 10px #00cc88;
+}
+
+.close-btn {
+  background: #555;
+  color: white;
+}
+
+.dark-mode .close-btn {
+  background: #444;
+  border: 1px solid #666;
+}
+
 .theme-toggle {
   position: fixed;
   top: 1rem;
@@ -320,11 +443,6 @@ export default {
   box-shadow: 0 0 10px #0ff;
 }
 
-/* Rest deiner Styles wie .results, .modal, .controls, etc. bleiben gleich */
-</style>
-
-<!-- GLOBAL STYLES für den body -->
-<style>
 body {
   background-color: #ffffff;
   transition: background-color 0.4s ease;
