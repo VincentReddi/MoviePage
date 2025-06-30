@@ -53,7 +53,7 @@
           <div class="info">
             <h2>{{ movie.title }}</h2>
             <p class="meta">Status: {{ movie.status }}</p>
-            <p class="overview">{{ movie.description.slice(0, 150) }}...</p>
+            <p class="overview">{{ movie.overview?.slice(0, 150) || 'Keine Beschreibung vorhanden.' }}...</p>
           </div>
         </div>
       </div>
