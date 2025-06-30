@@ -41,7 +41,7 @@
       <div class="results">
         <div
             v-for="movie in savedMovies"
-            :key="movie.tmdbId"
+            :key="movie.id"
             class="movie-card"
         >
           <img
@@ -52,16 +52,26 @@
           />
           <div class="info">
             <h2>{{ movie.title }}</h2>
-            <p class="meta">
-              Status:
+            <p class="meta">Status: {{ movie.status || '–' }}</p>
+            <p class="overview">{{ movie.description.slice(0, 150) }}...</p>
+
+            <!-- Status ändern -->
+            <div class="status">
+              <label>Status ändern:</label>
               <select v-model="movie.status" @change="updateMovieStatus(movie)">
-                <option>Geplant</option>
-                <option>Geschaut</option>
+                <option value="Geplant">Geplant</option>
+                <option value="Geschaut">Geschaut</option>
               </select>
-            </p>
-            <p class="overview">
-              {{ movie.description ? movie.description.slice(0, 150) : 'Keine Beschreibung vorhanden...' }}
-            </p>
+            </div>
+
+            <!-- Bewertung -->
+            <div class="rating">
+              <label>Bewertung:</label>
+              <select v-model="movie.rating" @change="updateMovieRating(movie)">
+                <option disabled value="">–</option>
+                <option v-for="n in 10" :key="n" :value="n">{{ n }}</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -143,7 +153,7 @@ export default {
         status: 'Geplant',
         genre: 'Unbekannt',
         platform: 'Unbekannt',
-        tmdbId: movie.id.toString()
+        rating: null
       }
 
       try {
@@ -181,19 +191,28 @@ export default {
     },
     async updateMovieStatus(movie) {
       try {
-        const res = await fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${movie.id}/status`, {
+        await fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${movie.id}/status`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(movie.status)
-        });
-
-        if (!res.ok) throw new Error('Update fehlgeschlagen');
+        })
       } catch (e) {
-        alert("Fehler beim Aktualisieren des Status");
-        console.error(e);
+        alert("Fehler beim Aktualisieren des Status.")
+        console.error(e)
+      }
+    },
+    async updateMovieRating(movie) {
+      try {
+        await fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${movie.id}/rating`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(movie.rating)
+        })
+      } catch (e) {
+        alert("Fehler beim Aktualisieren der Bewertung.")
+        console.error(e)
       }
     }
-
   }
 }
 </script>
@@ -332,12 +351,23 @@ export default {
 .close-btn:hover {
   background-color: #333;
 }
-select {
-  background-color: #222;
+
+.status,
+.rating {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+.status label,
+.rating label {
+  margin-right: 0.5rem;
+  color: #ccc;
+}
+.status select,
+.rating select {
+  padding: 0.25rem 0.5rem;
+  background-color: #333;
   color: white;
   border: none;
   border-radius: 0.5rem;
-  padding: 0.25rem 0.5rem;
-  margin-left: 0.5rem;
 }
 </style>

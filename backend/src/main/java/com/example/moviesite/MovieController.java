@@ -47,6 +47,20 @@ public class MovieController {
         }
     }
 
+    @PutMapping("/{id}/rating")
+    public ResponseEntity<Movie> updateRating(@PathVariable Long id, @RequestBody Double rating) {
+        Optional<Movie> movieOpt = movieRepository.findById(id);
+        if (movieOpt.isPresent()) {
+            Movie movie = movieOpt.get();
+            movie.setRating(rating);
+            movieRepository.save(movie);
+            return ResponseEntity.ok(movie);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
 
 
 }
