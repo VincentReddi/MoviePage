@@ -1,6 +1,9 @@
 <template>
   <div class="movie-search">
-    <!-- Suchleiste -->
+    <button @click="toggleDarkMode" class="theme-toggle-button">
+      {{ isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode' }}
+    </button>
+
     <input
         type="text"
         v-model="query"
@@ -9,7 +12,6 @@
         class="search-input"
     />
 
-    <!-- Genre-Dropdown -->
     <select v-model="selectedGenre" @change="searchMovies" class="genre-select">
       <option value="">🎬 Genre auswählen</option>
       <option v-for="genre in genres" :key="genre.id" :value="genre.id">
@@ -17,7 +19,6 @@
       </option>
     </select>
 
-    <!-- Suchergebnisse -->
     <div v-if="results.length" class="results">
       <div
           v-for="movie in results"
@@ -42,7 +43,6 @@
       </div>
     </div>
 
-    <!-- Gespeicherte Filme -->
     <div v-if="savedMovies.length" class="saved-movies">
       <h2 class="saved-title">📌 Gespeicherte Filme</h2>
       <button @click="clearMovieList" class="clear-btn">🗑️ Liste leeren</button>
@@ -81,7 +81,6 @@
       </div>
     </div>
 
-    <!-- Modal -->
     <div v-if="selectedMovie" class="modal" @click.self="selectedMovie = null">
       <div class="modal-content">
         <img
@@ -113,12 +112,19 @@ export default {
       genres: [],
       results: [],
       selectedMovie: null,
-      savedMovies: []
+      savedMovies: [],
+      isDarkMode: true // Standardmäßig Dark Mode
     }
   },
   async mounted() {
-    await this.fetchSavedMovies()
-    await this.fetchGenres()
+    await this.fetchSavedMovies();
+    await this.fetchGenres();
+    // Beim Laden den gespeicherten Modus anwenden
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light-mode') {
+      this.isDarkMode = false;
+      document.body.classList.add('light-mode');
+    }
   },
   methods: {
     async fetchSavedMovies() {
@@ -235,6 +241,16 @@ export default {
         alert('Fehler beim Aktualisieren der Bewertung')
         console.error(e)
       }
+    },
+    toggleDarkMode() {
+      this.isDarkMode = !this.isDarkMode;
+      if (this.isDarkMode) {
+        document.body.classList.remove('light-mode');
+        localStorage.setItem('theme', 'dark-mode');
+      } else {
+        document.body.classList.add('light-mode');
+        localStorage.setItem('theme', 'light-mode');
+      }
     }
   }
 }
@@ -248,7 +264,29 @@ export default {
   margin: 0 auto;
   color: #f0f0f0;
   box-sizing: border-box;
+  position: relative; /* Wichtig für die Positionierung des Buttons */
 }
+
+/* Dark/Light Mode Button Styling */
+.theme-toggle-button {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #555;
+  color: white;
+  border: none;
+  border-radius: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  z-index: 10; /* Stellt sicher, dass der Button über anderen Elementen liegt */
+}
+
+.theme-toggle-button:hover {
+  background-color: #777;
+}
+
 .search-input, .genre-select {
   width: 100%;
   margin-bottom: 1rem;
@@ -374,5 +412,74 @@ export default {
 }
 .close-btn:hover {
   background-color: #333;
+}
+
+/* Light Mode Styles */
+/* Diese Stile werden angewendet, wenn das Body-Element die Klasse 'light-mode' hat */
+body.light-mode {
+  background-color: #f0f2f5; /* Hellerer Hintergrund */
+  color: #333; /* Dunklerer Text */
+}
+
+body.light-mode .movie-search {
+  color: #333;
+}
+
+body.light-mode .search-input,
+body.light-mode .genre-select {
+  background-color: #e0e2e5; /* Hellerer Hintergrund für Eingabefelder */
+  color: #333;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+body.light-mode .search-input::placeholder {
+  color: #666; /* Hellerer Platzhalter-Text */
+}
+
+body.light-mode .movie-card {
+  background: #fff; /* Hellerer Hintergrund für Filmkarten */
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+body.light-mode .movie-card .info h2 {
+  color: #333; /* Dunklerer Titel-Text */
+}
+
+body.light-mode .movie-card .meta {
+  color: #777; /* Dunklerer Meta-Text */
+}
+
+body.light-mode .movie-card .overview {
+  color: #555; /* Dunklerer Überblick-Text */
+}
+
+body.light-mode .saved-title {
+  color: #333; /* Dunklerer Titel für gespeicherte Filme */
+}
+
+body.light-mode .clear-btn {
+  background-color: #ff5c5c; /* Angepasste Farbe für den Lösch-Button */
+}
+
+body.light-mode .modal-content {
+  background: #eee; /* Hellerer Hintergrund für das Modal */
+  color: #333;
+}
+
+body.light-mode .add-btn {
+  background-color: #4cd964; /* Angepasste Farbe für den Hinzufügen-Button */
+}
+
+body.light-mode .close-btn {
+  background-color: #aaa; /* Angepasste Farbe für den Schließen-Button */
+}
+
+body.light-mode .theme-toggle-button {
+  background-color: #bbb; /* Angepasste Farbe für den Toggle-Button im Light Mode */
+  color: #333;
+}
+
+body.light-mode .theme-toggle-button:hover {
+  background-color: #ccc;
 }
 </style>
