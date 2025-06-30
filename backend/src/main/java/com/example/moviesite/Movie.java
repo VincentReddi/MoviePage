@@ -9,6 +9,7 @@ public class Movie {
     @Id
     @GeneratedValue
     private Long id;
+    private Long id2;
     private Double rating;
 
     private String title;
