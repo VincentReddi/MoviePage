@@ -128,14 +128,8 @@ export default {
     async addToList(movie) {
       const payload = {
         title: movie.title,
-        posterPath: movie.poster_path,
-        releaseDate: movie.release_date,
-        description: movie.overview,
-        status: 'geplant',
-        genre: 'Unbekannt',
-        platform: 'Unbekannt',
-        tmdbId: movie.id.toString()
-      }
+        posterPath: movie.poster_path  // TMDb liefert `poster_path`, dein Backend erwartet `posterPath`
+      };
 
       try {
         const res = await fetch('https://popcornpilot-backend-new.onrender.com/api/movies', {

@@ -1,6 +1,5 @@
 package com.example.moviesite;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,53 +10,24 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class MovieController {
 
-    private final RatingRepository ratingRepository;
     private final MovieRepository movieRepository;
 
-    public MovieController(RatingRepository ratingRepository, MovieRepository movieRepository) {
-        this.ratingRepository = ratingRepository;
+    public MovieController(MovieRepository movieRepository) {
         this.movieRepository = movieRepository;
     }
 
-    @PostConstruct
-    public void init() {
-        if (movieRepository.findAll().isEmpty()) {
-            Movie example = new Movie(
-                    "Interstellar", "Sci-Fi", "Netflix",
-                    "Ein episches Sci-Fi-Abenteuer über Zeit und Raum.",
-                    "157336",  // TMDb-ID
-                    "https://image.tmdb.org/t/p/original/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
-                    "Geplant"
-            );
-            movieRepository.save(example);
-        }
-    }
-
-
-    @PostMapping
-    public ResponseEntity<Movie> addMovie(@RequestBody Movie movie) {
-        Movie saved = movieRepository.save(movie);
-        return ResponseEntity.ok(saved);
-    }
-
     @GetMapping
-    public List<Movie> getMovies() {
-
-
+    public List<Movie> getAll() {
         return movieRepository.findAll();
     }
 
-
-    @PutMapping("/{tmdbId}/rating")
-    public Rating updateRating(@PathVariable String tmdbId, @RequestBody Double ratingValue) {
-        Rating rating = new Rating(tmdbId, ratingValue);
-        return ratingRepository.save(rating);
+    @PostMapping
+    public ResponseEntity<Movie> addMovie(@RequestBody Movie movie) {
+        return ResponseEntity.ok(movieRepository.save(movie));
     }
 
     @DeleteMapping
-    public void deleteAllMovies() {
+    public void deleteAll() {
         movieRepository.deleteAll();
     }
-
-
 }
