@@ -8,6 +8,7 @@
         class="search-input"
     />
 
+    <!-- Suchergebnisse -->
     <div v-if="results.length" class="results">
       <div
           v-for="movie in results"
@@ -139,7 +140,7 @@ export default {
       try {
         const res = await fetch('https://popcornpilot-backend-new.onrender.com/api/movies', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {'Content-Type': 'application/json'},
           body: JSON.stringify(payload)
         })
 
@@ -182,6 +183,7 @@ export default {
   color: #f0f0f0;
   box-sizing: border-box;
 }
+
 .search-input {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -190,59 +192,70 @@ export default {
   border-radius: 1rem;
   background-color: #1e1e1e;
   color: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
 }
+
 .search-input::placeholder {
   color: #aaa;
 }
+
 .results {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
 }
+
 .movie-card {
   background: #1a1a1a;
   border-radius: 1.25rem;
   overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
   transition: transform 0.2s ease;
   cursor: pointer;
 }
+
 .movie-card:hover {
   transform: translateY(-5px);
 }
+
 .poster {
   width: 100%;
   height: auto;
   object-fit: cover;
 }
+
 .info {
   padding: 1rem;
 }
+
 .info h2 {
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
   color: #fff;
 }
+
 .meta {
   font-size: 0.9rem;
   color: #999;
   margin-bottom: 0.5rem;
 }
+
 .overview {
   font-size: 0.9rem;
   color: #ccc;
 }
+
 .saved-title {
   margin-top: 3rem;
   font-size: 1.5rem;
   font-weight: 600;
   color: #fff;
 }
+
 .clear-btn {
   margin-bottom: 1rem;
   padding: 0.5rem 1rem;
@@ -254,7 +267,77 @@ export default {
   font-weight: bold;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
+
 .clear-btn:hover {
   background-color: #ff1f1a;
+}
+
+/* Modal Fix */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  background: #2c2c2e;
+  padding: 2rem;
+  border-radius: 1.25rem;
+  max-width: 600px;
+  width: 90%;
+  color: white;
+  display: flex;
+  gap: 1.5rem;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.modal-poster {
+  width: 200px;
+  border-radius: 1rem;
+}
+
+.modal-info {
+  flex: 1;
+}
+
+.modal-overview {
+  margin-top: 1rem;
+  color: #ccc;
+  line-height: 1.4;
+}
+
+.add-btn, .close-btn {
+  margin-top: 1rem;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.add-btn {
+  background-color: #34c759;
+  color: white;
+  margin-right: 1rem;
+}
+
+.add-btn:hover {
+  background-color: #28a745;
+}
+
+.close-btn {
+  background-color: #ff3b30;
+  color: white;
+}
+
+.close-btn:hover {
+  background-color: #e0281f;
 }
 </style>
