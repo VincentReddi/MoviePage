@@ -12,8 +12,6 @@ public class Movie {
 
     private String title;
     private String posterPath;
-
-    private String tmdbId;
     private String status;
 
     public Movie() {}
@@ -24,17 +22,13 @@ public class Movie {
     }
 
     public Long getId() { return id; }
+
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 
     public String getPosterPath() { return posterPath; }
     public void setPosterPath(String posterPath) { this.posterPath = posterPath; }
 
-    public String getTmdbId() {
-        return tmdbId;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

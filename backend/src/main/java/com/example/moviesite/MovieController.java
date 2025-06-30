@@ -33,15 +33,13 @@ public class MovieController {
     }
 
     // Neuer Endpunkt zum Aktualisieren des Status
-    @PutMapping("/{tmdbId}/status")
-    public ResponseEntity<Movie> updateStatus(@PathVariable String tmdbId, @RequestBody String status) {
-        Optional<Movie> movieOpt = movieRepository.findAll().stream()
-                .filter(m -> tmdbId.equals(m.getTmdbId()))
-                .findFirst();
+    @PutMapping("/{id}/status")
+    public ResponseEntity<Movie> updateStatus(@PathVariable Long id, @RequestBody String status) {
+        Optional<Movie> movieOpt = movieRepository.findById(id);
 
         if (movieOpt.isPresent()) {
             Movie movie = movieOpt.get();
-            movie.setStatus(status.replace("\"", "")); // Quotes aus JSON-String entfernen
+            movie.setStatus(status.replace("\"", ""));
             movieRepository.save(movie);
             return ResponseEntity.ok(movie);
         } else {
