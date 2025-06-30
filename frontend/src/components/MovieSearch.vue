@@ -29,7 +29,7 @@
             {{ movie.release_date?.slice(0, 4) || 'N/A' }} · ⭐
             {{ movie.vote_average ? movie.vote_average.toFixed(1) : '–' }}
           </p>
-          <p class="overview">{{ movie.overview?.slice(0, 150) || 'Keine Beschreibung vorhanden.' }}...</p>
+          <p class="overview">{{ movie.overview.slice(0, 150) }}...</p>
         </div>
       </div>
     </div>
@@ -52,8 +52,16 @@
           />
           <div class="info">
             <h2>{{ movie.title }}</h2>
-            <p class="meta">Status: {{ movie.status }}</p>
-            <p class="overview">{{ movie.overview?.slice(0, 150) || 'Keine Beschreibung vorhanden.' }}...</p>
+            <p class="meta">
+              Status:
+              <select v-model="movie.status" @change="updateMovieStatus(movie)">
+                <option>Geplant</option>
+                <option>Geschaut</option>
+              </select>
+            </p>
+            <p class="overview">
+              {{ movie.description ? movie.description.slice(0, 150) : 'Keine Beschreibung vorhanden...' }}
+            </p>
           </div>
         </div>
       </div>
@@ -170,45 +178,26 @@ export default {
         alert("Fehler beim Leeren der Liste.")
         console.error(e)
       }
+    },
+    async updateMovieStatus(movie) {
+      try {
+        const res = await fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${movie.tmdbId}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(movie.status)
+        })
+
+        if (!res.ok) {
+          throw new Error("Update fehlgeschlagen")
+        }
+      } catch (e) {
+        alert("Fehler beim Aktualisieren des Status")
+        console.error(e)
+      }
     }
   }
 }
 </script>
-
-<style scoped>
-/* ... dein gesamtes Styling bleibt unverändert ... */
-
-.clear-btn {
-  margin-bottom: 1rem;
-  padding: 0.5rem 1rem;
-  background-color: #ff3b30;
-  color: white;
-  border: none;
-  border-radius: 1rem;
-  cursor: pointer;
-  font-weight: bold;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-}
-.clear-btn:hover {
-  background-color: #ff1f1a;
-}
-
-.clear-btn {
-  margin-bottom: 1rem;
-  padding: 0.5rem 1rem;
-  background-color: #ff3b30;
-  color: white;
-  border: none;
-  border-radius: 1rem;
-  cursor: pointer;
-  font-weight: bold;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-}
-.clear-btn:hover {
-  background-color: #ff1f1a;}
-
-</style>
-
 
 <style scoped>
 .movie-search {
@@ -343,5 +332,13 @@ export default {
 }
 .close-btn:hover {
   background-color: #333;
+}
+select {
+  background-color: #222;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  margin-left: 0.5rem;
 }
 </style>
