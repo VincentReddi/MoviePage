@@ -9,6 +9,7 @@ public class Movie {
     @Id
     @GeneratedValue
     private Long id;
+    private Long test;
 
     private String title;
     private String posterPath;
