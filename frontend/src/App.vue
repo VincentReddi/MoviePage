@@ -3,7 +3,7 @@
   <div id="app">
     <LoginPage v-if="!isLoggedIn" @login-success="isLoggedIn = true" />
     <div v-else>
-      <!-- Deine Hauptkomponenten -->
+      <h1 class="title">🍿 PopcornPilot</h1>
       <MovieSearch />
       <MovieList />
     </div>
