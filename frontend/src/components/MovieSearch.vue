@@ -1,5 +1,10 @@
 <template>
-  <div class="movie-search">
+  <div :class="['movie-search', { 'dark-mode': darkMode }]">
+    <!-- Dark Mode Toggle -->
+    <button class="theme-toggle" @click="toggleDarkMode">
+      {{ darkMode ? '☀️ Light Mode' : '🌙 Dark Mode' }}
+    </button>
+
     <!-- Suchleiste -->
     <input
         type="text"
@@ -114,14 +119,24 @@ export default {
       genres: [],
       results: [],
       selectedMovie: null,
-      savedMovies: []
+      savedMovies: [],
+      darkMode: false
     };
   },
   async mounted() {
     await this.fetchSavedMovies();
     await this.fetchGenres();
+    this.loadDarkModePreference();
   },
   methods: {
+    toggleDarkMode() {
+      this.darkMode = !this.darkMode;
+      localStorage.setItem('darkMode', this.darkMode);
+    },
+    loadDarkModePreference() {
+      const savedMode = localStorage.getItem('darkMode');
+      this.darkMode = savedMode === 'true';
+    },
     async fetchSavedMovies() {
       try {
         const res = await fetch('https://popcornpilot-backend-new.onrender.com/api/movies');
@@ -141,18 +156,21 @@ export default {
       }
     },
     async searchMovies() {
-      if (this.query.length < 2) {
+      const apiKey = '3e1a60c002b082d8f881975fa6a5fe50';
+
+      let url = '';
+      if (this.query.length >= 2) {
+        url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(this.query)}&api_key=${apiKey}&language=de`;
+      } else if (this.selectedGenre) {
+        url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=${this.selectedGenre}&language=de`;
+      } else {
         this.results = [];
         return;
       }
-      const apiKey = '3e1a60c002b082d8f881975fa6a5fe50';
-      let url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(this.query)}&api_key=${apiKey}&language=de`;
+
       try {
         const res = await fetch(url);
         const data = await res.json();
-        if (this.selectedGenre) {
-          data.results = data.results.filter(m => m.genre_ids.includes(Number(this.selectedGenre)));
-        }
         this.results = data.results;
       } catch (e) {
         console.error('Fehler bei TMDb-Suche:', e);
@@ -162,6 +180,11 @@ export default {
       this.selectedMovie = movie;
     },
     async addToList(movie) {
+      if (this.savedMovies.some(m => m.title === movie.title)) {
+        alert('Dieser Film ist bereits gespeichert.');
+        return;
+      }
+
       const payload = {
         title: movie.title,
         posterPath: movie.poster_path,
@@ -213,7 +236,7 @@ export default {
         await fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${movie.id}/status`, {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(movie.status)
+          body: JSON.stringify({ status: movie.status })
         });
       } catch (e) {
         alert('Fehler beim Aktualisieren des Status');
@@ -225,7 +248,7 @@ export default {
         await fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${movie.id}/rating`, {
           method: 'PUT',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(movie.rating)
+          body: JSON.stringify({ rating: movie.rating })
         });
       } catch (e) {
         alert('Fehler beim Aktualisieren der Bewertung');
@@ -241,7 +264,13 @@ export default {
   padding: 2rem;
   max-width: 1200px;
   margin: auto;
-  color: #fff;
+  color: #111;
+  background-color: #f4f4f4;
+}
+
+.dark-mode {
+  background-color: #121212;
+  color: #ffffff;
 }
 
 .search-input,
@@ -251,6 +280,12 @@ export default {
   padding: 0.75rem;
   border-radius: 8px;
   border: none;
+  background: #eaeaea;
+  color: #111;
+}
+
+.dark-mode .search-input,
+.dark-mode .genre-select {
   background: #222;
   color: #fff;
 }
@@ -262,11 +297,15 @@ export default {
 }
 
 .movie-card {
-  background: #1a1a1a;
+  background: #ffffff;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
   width: 240px;
+}
+
+.dark-mode .movie-card {
+  background: #1a1a1a;
 }
 
 .poster {
@@ -321,16 +360,22 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 999;
 }
 
 .modal-content {
-  background: #222;
+  background: #fff;
   padding: 2rem;
   border-radius: 12px;
-  color: white;
+  color: #000;
   max-width: 800px;
   display: flex;
   gap: 2rem;
+}
+
+.dark-mode .modal-content {
+  background: #222;
+  color: white;
 }
 
 .modal-poster {
@@ -357,5 +402,22 @@ export default {
 .close-btn {
   background: #555;
   color: white;
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1000;
+  padding: 0.5rem 1rem;
+  background: #444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  background: #666;
 }
 </style>

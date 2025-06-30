@@ -12,7 +12,7 @@ Eine moderne Web-App zur Verwaltung von Filmen, die man sehen will, bereits gese
 2. Filme nach Genre filtern  
 3. Film zur Liste hinzufügen  
 4. Status setzen (geplant, gesehen, abgebrochen)  
-5. Zufallsvorschlag  
+5. Darkmode
 6. Filminformationen von TMDb anzeigen  
 7. Film selber bewerten  
 
