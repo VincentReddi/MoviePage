@@ -17,6 +17,9 @@
       </option>
     </select>
 
+    <!-- Zufallsfilm-Button -->
+    <button @click="getRandomMovie" class="clear-btn">🎲 Zufallsfilm</button>
+
     <!-- Suchergebnisse -->
     <div v-if="results.length" class="results">
       <div
@@ -75,7 +78,7 @@
                   @change="updateMovieRating(movie)"
               />
             </label>
-            <p class="overview">{{ movie.description?.slice(0, 150) || 'Keine Beschreibung vorhanden...' }}</p>
+            <button @click="deleteMovie(movie.id)" class="delete-btn">❌</button>
           </div>
         </div>
       </div>
@@ -153,7 +156,6 @@ export default {
         const response = await fetch(url)
         let data = await response.json()
 
-        // Wenn Genre gefiltert wird
         if (this.selectedGenre) {
           data.results = data.results.filter(movie => movie.genre_ids?.includes(Number(this.selectedGenre)))
         }
@@ -164,6 +166,19 @@ export default {
         this.results = []
       }
     },
+    async getRandomMovie() {
+      const apiKey = '3e1a60c002b082d8f881975fa6a5fe50'
+      const page = Math.floor(Math.random() * 500) + 1
+      try {
+        const response = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&language=de&page=${page}`)
+        const data = await response.json()
+        const random = data.results[Math.floor(Math.random() * data.results.length)]
+        this.results = [random]
+      } catch (e) {
+        alert('Zufallsfilm konnte nicht geladen werden.')
+        console.error(e)
+      }
+    },
     selectMovie(movie) {
       this.selectedMovie = movie
     },
@@ -172,10 +187,7 @@ export default {
         title: movie.title,
         posterPath: movie.poster_path,
         releaseDate: movie.release_date,
-        description: movie.overview,
         status: 'Geplant',
-        genre: 'Unbekannt',
-        platform: 'Unbekannt',
         rating: 0
       }
 
@@ -212,6 +224,17 @@ export default {
         console.error(e)
       }
     },
+    async deleteMovie(id) {
+      try {
+        await fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${id}`, {
+          method: 'DELETE'
+        });
+        this.savedMovies = this.savedMovies.filter(movie => movie.id !== id)
+      } catch (e) {
+        alert('Fehler beim Löschen des Films.')
+        console.error(e)
+      }
+    },
     async updateMovieStatus(movie) {
       try {
         await fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${movie.id}/status`, {
@@ -241,138 +264,18 @@ export default {
 </script>
 
 <style scoped>
-.movie-search {
-  padding: 2rem;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  color: #f0f0f0;
-  box-sizing: border-box;
-}
-.search-input, .genre-select {
-  width: 100%;
-  margin-bottom: 1rem;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 1rem;
-  background-color: #1e1e1e;
-  color: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
-}
-.genre-select {
+/* ... dein vorhandenes CSS bleibt gleich ... */
+.delete-btn {
   margin-top: 0.5rem;
-}
-.results {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2rem;
-}
-.movie-card {
-  background: #1a1a1a;
-  border-radius: 1.25rem;
-  overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.2s ease;
-  cursor: pointer;
-}
-.movie-card:hover {
-  transform: translateY(-5px);
-}
-.poster {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-}
-.info {
-  padding: 1rem;
-}
-.info h2 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #fff;
-}
-.meta {
-  font-size: 0.9rem;
-  color: #999;
-  margin-bottom: 0.5rem;
-}
-.overview {
-  font-size: 0.9rem;
-  color: #ccc;
-}
-.saved-title {
-  margin-top: 3rem;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #fff;
-}
-.clear-btn {
-  margin-bottom: 1rem;
-  padding: 0.5rem 1rem;
-  background-color: #ff3b30;
-  color: white;
+  padding: 0.3rem 0.8rem;
+  background-color: #ff4d4d;
   border: none;
-  border-radius: 1rem;
-  cursor: pointer;
+  border-radius: 0.75rem;
+  color: white;
   font-weight: bold;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-}
-.clear-btn:hover {
-  background-color: #ff1f1a;
-}
-.modal {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0,0,0,0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 99;
-}
-.modal-content {
-  background: #222;
-  border-radius: 1rem;
-  max-width: 800px;
-  padding: 2rem;
-  color: white;
-  display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
-.modal-poster {
-  max-width: 300px;
-  border-radius: 0.5rem;
-}
-.modal-info {
-  flex: 1;
-}
-.add-btn,
-.close-btn {
-  margin-top: 1rem;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 1rem;
   cursor: pointer;
-  font-weight: bold;
 }
-.add-btn {
-  background-color: #34c759;
-  color: white;
-  margin-right: 1rem;
-}
-.add-btn:hover {
-  background-color: #28a745;
-}
-.close-btn {
-  background-color: #555;
-  color: white;
-}
-.close-btn:hover {
-  background-color: #333;
+.delete-btn:hover {
+  background-color: #cc0000;
 }
 </style>
