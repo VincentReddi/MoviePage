@@ -80,7 +80,7 @@
                     @change="updateMovieRating(movie)"
                 />
               </label>
-              <button @click="deleteMovie(movie.id)" class="delete-single-btn">❌</button>
+              <!-- ❌ Einzel-Löschbutton entfernt -->
             </div>
           </div>
         </div>
@@ -157,10 +157,13 @@ export default {
     },
     async searchMovies() {
       const apiKey = '3e1a60c002b082d8f881975fa6a5fe50';
-
       let url = '';
+
       if (this.query.length >= 2) {
         url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(this.query)}&api_key=${apiKey}&language=de`;
+        if (this.selectedGenre) {
+          url += `&with_genres=${this.selectedGenre}`;
+        }
       } else if (this.selectedGenre) {
         url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=${this.selectedGenre}&language=de`;
       } else {
@@ -189,7 +192,8 @@ export default {
         title: movie.title,
         posterPath: movie.poster_path,
         status: 'Geplant',
-        rating: 0
+        rating: 0,
+        id: movie.id
       };
       try {
         const res = await fetch('https://popcornpilot-backend-new.onrender.com/api/movies', {
@@ -219,16 +223,6 @@ export default {
       } catch (e) {
         alert("Fehler beim Leeren der Liste.");
         console.error(e);
-      }
-    },
-    async deleteMovie(id) {
-      try {
-        await fetch(`https://popcornpilot-backend-new.onrender.com/api/movies/${id}`, {
-          method: 'DELETE'
-        });
-        this.savedMovies = this.savedMovies.filter(movie => movie.id !== id);
-      } catch (e) {
-        console.error("Fehler beim Löschen des Films", e);
       }
     },
     async updateMovieStatus(movie) {
@@ -266,11 +260,13 @@ export default {
   margin: auto;
   color: #111;
   background-color: #f4f4f4;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 .dark-mode {
-  background-color: #121212;
-  color: #ffffff;
+  background-color: #0e0e0e;
+  color: #e0e0e0;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 .search-input,
@@ -287,6 +283,7 @@ export default {
 .dark-mode .search-input,
 .dark-mode .genre-select {
   background: #222;
+  border: 1px solid #555;
   color: #fff;
 }
 
@@ -305,7 +302,14 @@ export default {
 }
 
 .dark-mode .movie-card {
-  background: #1a1a1a;
+  background: #1c1c1c;
+  border: 1px solid #0ff;
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.dark-mode .movie-card:hover {
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
 }
 
 .poster {
@@ -324,19 +328,17 @@ export default {
   gap: 0.5rem;
 }
 
-.delete-single-btn {
-  background: #ff4d4d;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0.3rem 0.6rem;
-  cursor: pointer;
-  font-weight: bold;
-  width: fit-content;
+input[type="number"] {
+  width: 60px;
+  padding: 0.3rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
-.delete-single-btn:hover {
-  background: #e60000;
+.dark-mode input[type="number"] {
+  background: #333;
+  color: #fff;
+  border: 1px solid #555;
 }
 
 .clear-btn {
@@ -374,8 +376,9 @@ export default {
 }
 
 .dark-mode .modal-content {
-  background: #222;
+  background: #1a1a1a;
   color: white;
+  border: 1px solid #444;
 }
 
 .modal-poster {
@@ -399,9 +402,19 @@ export default {
   color: white;
 }
 
+.dark-mode .add-btn {
+  background: #00cc88;
+  box-shadow: 0 0 10px #00cc88;
+}
+
 .close-btn {
   background: #555;
   color: white;
+}
+
+.dark-mode .close-btn {
+  background: #444;
+  border: 1px solid #666;
 }
 
 .theme-toggle {
@@ -417,7 +430,16 @@ export default {
   cursor: pointer;
 }
 
-.theme-toggle:hover {
-  background: #666;
+.dark-mode .theme-toggle {
+  background: linear-gradient(135deg, #222, #444);
+  color: #0ff;
+  border: 1px solid #0ff;
+  text-shadow: 0 0 6px #0ff;
+}
+
+.dark-mode .theme-toggle:hover {
+  background: #0ff;
+  color: #000;
+  box-shadow: 0 0 10px #0ff;
 }
 </style>
