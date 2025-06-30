@@ -12,6 +12,7 @@ import java.util.Optional;
 public class MovieController {
 
     private final MovieRepository movieRepository;
+    private final String test = "test";
 
     public MovieController(MovieRepository movieRepository) {
         this.movieRepository = movieRepository;
