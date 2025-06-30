@@ -1,24 +1,32 @@
+
 <template>
   <div id="app">
-    <h1 class="title">🍿 PopcornPilot</h1>
-    <MovieSearch />
+    <LoginPage v-if="!isLoggedIn" @login-success="isLoggedIn = true" />
+    <div v-else>
+      <!-- Deine Hauptkomponenten -->
+      <MovieSearch />
+    </div>
   </div>
 </template>
 
 <script>
+import LoginPage from './components/LoginPage.vue'
 import MovieSearch from './components/MovieSearch.vue'
 
 export default {
-  name: 'App',
   components: {
+    LoginPage,
     MovieSearch
+  },
+  data() {
+    return {
+      isLoggedIn: false
+    }
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  padding: 2rem;
-}
+/* Optional global styling */
+
 </style>
