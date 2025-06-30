@@ -63,4 +63,8 @@ export default {
   margin-top: 2rem;
   color: #bbb;
 }
+
+
 </style>
+
+
