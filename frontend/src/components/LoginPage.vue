@@ -1,6 +1,6 @@
 <template>
   <div class="login-container">
-    <h2 class="title">Willkommen bei MoviePage</h2>
+    <h2 class="title">Willkommen bei PopcornPilot</h2>
     <div class="login-box">
       <input v-model="username" placeholder="Benutzername" class="input" />
       <input v-model="password" placeholder="Passwort" type="password" class="input" />
