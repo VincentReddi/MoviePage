@@ -1,34 +1,55 @@
-# Projekt: Moviesite
+# 🎬 PopcornPilot 
 
-Dies ist unser Projekt für das Modul **Web-Technologien (Sommersemester 2025)** an der HTW Berlin.
+**PopcornPilot** ist eine Webanwendung zur Verwaltung und Bewertung von Filmen. Nutzer können Filme durchsuchen, zur Watchlist hinzufügen, den Status setzen und eigene Bewertungen abgeben.  
+Das Projekt wurde mit **Vue.js** im Frontend, **Spring Boot** im Backend und einer **PostgreSQL-Datenbank** umgesetzt.  
 
-## Projektidee
+---
 
-Eine moderne Web-App zur Verwaltung von Filmen, die man sehen will, bereits gesehen hat oder abgebrochen hat – inklusive Bewertung, Sortierung, TMDb-Anbindung und zufälligen Empfehlungen.
+## 🚀 Live-Demo (Render Deployment)
 
-## Geplante Use Cases
+👉 [Hier geht’s zur öffentlich erreichbaren Web-App](https://popcornpilot.onrender.com/)  
 
-1. Film suchen  
-2. Filme nach Genre filtern  
-3. Film zur Liste hinzufügen  
-4. Status setzen (geplant, gesehen, abgebrochen)  
-5. Darkmode
-6. Filminformationen von TMDb anzeigen  
-7. Film selber bewerten  
+---
 
-## Projekt lokal starten
 
-```bash
+## 📦 Funktionen (Use Cases)
+
+- 🔍 Filme suchen  
+- 🎬 Filme nach Genre filtern  
+- 📥 Film zur Watchlist hinzufügen  
+- 🔄 Status setzen (geplant, gesehen, abgebrochen)  
+- 🌙 Darkmode  
+- 🧠 Filminformationen über externe TMDb-API anzeigen  
+- ⭐ Film selber bewerten  
+
+---
+
+## 🧰 Projekt starten (lokal)
+
+### Voraussetzungen
+
+- Node.js (v18+)
+- Java 17+
+- PostgreSQL
+- Gradle
+
+### 1. Datenbank einrichten
+
+- Lege lokal eine PostgreSQL-Datenbank an (z. B. `popcornpilot`)  
+- Erstelle einen Benutzer mit Passwort  
+
+
+### 2. Backend starten
+```
+cd backend
 ./gradlew bootRun
 ```
+Läuft unter http://localhost:8080
 
-Danach im Browser aufrufen:  
-http://localhost:8080/movies  
-→ Gibt eine Liste von zwei Dummy-Filmen als JSON zurück.
-
-## M1 (20. April)
-
-- GitHub-Repo erstellt  
-- Thema definiert  
-- Entity-Klasse `Movie` erstellt  
-- Dummy-GET-Route `/movies` über Spring Boot implementiert
+### 3. Frontend starten
+```
+cd frontend
+npm install
+npm run dev
+```
+läuft unter http://localhost:5173
